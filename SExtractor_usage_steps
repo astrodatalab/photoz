@@ -1,0 +1,445 @@
+Configuration file setup:
+
+
+FLAG IMAGE  flag.fits strings (n ≤ 4) File name(s) of the flag-image(s) . 
+
+FLAG TYPE OR keyword Combination expression for the method for flags on the same object: OR arithmetical OR, AND arithmetical AND, MIN minimum of all flag values, MAX maximum of all flag values, MOST most common flag value. 
+
+GAIN - float Gain (conversion factor in e”=ADU) used for error estimates of CCD magnitudes. 
+
+DETECT TYPE CCD keyword Type of device that produced the image: CCD linear detector like CCDs or NICMOS, PHOTO photographic scan. 
+
+MAG GAMMA - float γ of the emulsion (slope of the response function). Takes effect in PHOTO mode only but NEEDS to be specified, even for CCD images. 
+
+MAG ZEROPOINT - float Zero-point offset to be applied to magnitudes. 
+
+PIXEL SCALE - float Pixel size in arcsec. (for surface brightness parameters, FWHM and star/ galaxy separation only). 
+
+SATUR LEVEL - float Pixel value above which it is considered saturated. 
+
+SEEING FWHM - float FWHM of stellar images in arcsec. This quantity is used only for the neural network star/galaxy separation as expressed in the CLASS STAR output.
+
+
+Typically called ‘default.sex’, but a custom name can be given in the command line:
+
+Example usage on a single file:
+
+$ sex image -c configuration_file.txt -Parameter 1 value1 -Parameter 2 value2
+
+
+
+
+
+Background estimation:
+
+BACK SIZE - integers (n ≤ 2) Size, or Width, Height (in pixels) of a background mesh. 
+
+BACK FILTERSIZE - integers (n ≤ 2) Size, or Width, Height (in background meshes) of the background-filtering mask. 
+
+BACK TYPE AUTO keywords (n ≤ 2) What background is subtracted from the images: AUTO The internal interpolated background-map. In the manual it says “INTERNAL” here but the keyword is AUTO. MANUAL A user-supplied constant value provided in BACK VALUE. 
+
+BACK VALUE 0.0,0.0 floats (n ≤ 2) in BACK TYPE MANUAL mode, the constant value to be subtracted from the images. 
+
+BACKPHOTO THICK 24 integer Thickness (in pixels) of the background LOCAL annulus. 
+
+BACKPHOTO TYPE GLOBAL keyword Background used to compute magnitudes: GLOBAL taken directly from the background map, LOCAL recomputed in a rectangular annulus around the object. 
+
+
+sex 12-cutout-HSC-G-9813-pdr2_wide.fits -c default.param -checkimage_name check-12.fits
+
+
+Param file (named default.param):
+
+NUMBER    1               Running object number       
+DETECT_THRESH 3
+CATALOG_NAME output_image
+CATALOG_TYPE ASCII_HEAD
+CHECKIMAGE_TYPE  FILTERED  
+
+
+
+-------- i can use 
+“sex *-cutout-HSC-G-9813-pdr2_wide.fits -c default.param -checkimage_name check-12.fits”
+
+To process all cutouts at once, but how would I obtain checkimage names?
+
+for i in {1..9}; do sex $i-cutout-HSC-G-9813-pdr2_wide.fits -c default.sex -checkimage_name check.fits; done
+----------------
+6/3/21
+
+for i in {1..9}; do sex $i-cutout-HSC-G-9813-pdr2_wide.fits -c default.sex -checkimage_name $i-check.fits; done
+
+Default.sex file:
+
+# Default configuration file for SExtractor 2.25.0
+# EB 2021-05-31
+#
+XMIN_IMAGE 57.5
+XMAX_IMAGE 62.5
+YMIN_IMAGE 57.5
+YMAX_IMAGE 62.5
+NUMBER    1  
+
+X_IMAGE 60
+Y_IMAGE 60
+#-------------------------------- Catalog ------------------------------------
+ 
+CATALOG_NAME     test.cat       # name of the output catalog
+CATALOG_TYPE     ASCII_HEAD     # NONE,ASCII,ASCII_HEAD, ASCII_SKYCAT,
+                                # ASCII_VOTABLE, FITS_1.0 or FITS_LDAC
+PARAMETERS_NAME  default.param  # name of the file containing catalog contents
+ 
+#------------------------------- Extraction ----------------------------------
+ 
+DETECT_TYPE      CCD            # CCD (linear) or PHOTO (with gamma correction)
+DETECT_MINAREA   5              # min. # of pixels above threshold
+DETECT_THRESH    1.5            # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+ANALYSIS_THRESH  1.5            # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+ 
+FILTER           Y              # apply filter for detection (Y or N)?
+FILTER_NAME      gauss_1.5_3x3.conv   # name of the file containing the filter
+ 
+DEBLEND_NTHRESH  32             # Number of deblending sub-thresholds
+DEBLEND_MINCONT  0.005          # Minimum contrast parameter for deblending
+ 
+CLEAN            Y              # Clean spurious detections? (Y or N)?
+CLEAN_PARAM      1.0            # Cleaning efficiency
+ 
+MASK_TYPE        CORRECT        # type of detection MASKing: can be one of
+                                # NONE, BLANK or CORRECT
+ 
+#------------------------------ Photometry -----------------------------------
+ 
+PHOT_APERTURES   5              # MAG_APER aperture diameter(s) in pixels
+PHOT_AUTOPARAMS  2.5, 3.5       # MAG_AUTO parameters: <Kron_fact>,<min_radius>
+PHOT_PETROPARAMS 2.0, 3.5       # MAG_PETRO parameters: <Petrosian_fact>,
+                                # <min_radius>
+ 
+SATUR_LEVEL      50000.0        # level (in ADUs) at which arises saturation
+SATUR_KEY        SATURATE       # keyword for saturation level (in ADUs)
+ 
+MAG_ZEROPOINT    0.0            # magnitude zero-point
+MAG_GAMMA        4.0            # gamma of emulsion (for photographic scans)
+GAIN             0.0            # detector gain in e-/ADU
+GAIN_KEY         GAIN           # keyword for detector gain in e-/ADU
+PIXEL_SCALE      0.17            # size of pixel in arcsec (0=use FITS WCS info)
+ 
+#------------------------- Star/Galaxy Separation ----------------------------
+ 
+SEEING_FWHM      1.2            # stellar FWHM in arcsec
+STARNNW_NAME     default.nnw    # Neural-Network_Weight table filename
+ 
+#------------------------------ Background -----------------------------------
+ 
+BACK_SIZE        64             # Background mesh: <size> or <width>,<height>
+BACK_FILTERSIZE  3              # Background filter: <size> or <width>,<height>
+ 
+BACKPHOTO_TYPE   GLOBAL         # can be GLOBAL or LOCAL
+ 
+#------------------------------ Check Image ----------------------------------
+ 
+#CHECKIMAGE_TYPE  -BACKGROUND           # can be NONE, BACKGROUND, BACKGROUND_RMS,
+                                # MINIBACKGROUND, MINIBACK_RMS, -BACKGROUND,
+                                # FILTERED, OBJECTS, -OBJECTS, SEGMENTATION,
+                                # or APERTURES
+#CHECKIMAGE_NAME  check.fits     # Filename for the check-image
+ 
+#--------------------- Memory (change with caution!) -------------------------
+ 
+MEMORY_OBJSTACK  3000           # number of objects in stack
+MEMORY_PIXSTACK  300000         # number of pixels in stack
+MEMORY_BUFSIZE   1024           # number of lines in buffer
+ 
+#----------------------------- Miscellaneous ---------------------------------
+ 
+VERBOSE_TYPE     NORMAL         # can be QUIET, NORMAL or FULL
+HEADER_SUFFIX    .head          # Filename extension for additional headers
+WRITE_XML        N              # Write XML file (Y/N)?
+XML_NAME         sex.xml        # Filename for XML output  
+DETECT_THRESH 3
+NUMBER    1               Running object number       
+DETECT_THRESH 3
+CATALOG_NAME output_image
+CATALOG_TYPE ASCII_HEAD
+CHECKIMAGE_TYPE  FILTERED  
+ERRXY_IMAGE 5
+
+
+We want to use filtered and segmentation for checkimage_type to obtain filtered background subtracted images and masks of images, respectively.
+
+
+Automated process I need to do:
+
+1)Output segmented image and filtered (background subtracted too) images, as well as the barycenter x and y locations. 
+2) Upload catalog txt file to read the output params for the x and y barycenter locations.
+3) filter all objects with centers > 5 pixels away from the center of our image (60,60 is the center, I think since images are 120x120 pixels)
+4)combine filtered and cut segmented images
+
+Which params are the x and y center locations?
+XWIN_IMAGE
+YWIN_IMAGE
+
+XPEAK_IMAGE is the pixel x coordinate of the brightest pixel
+
+
+“PARAMETERS_NAME” configuration parameter specifies the file name where you can list the parameter values you want SExtractor to output in xml format for each object.
+
+
+Process to filter extra objects from images:
+
+#read i-cat.txt file
+#read filtered image into 2d array
+#read segmented image into 2d array
+
+
+
+
+
+
+#parse i-cat rows and use if statement:
+Nrows = _____
+For i in range(0, n rows):
+If row_i[1] GE 55 and row_i[1] LE 65:
+	If row_i[2] GE 55 and row_i[2] LE 65:
+	Object_num = row_i[0]
+
+#find pixels from segmented image that are equal to object_num and create a 3rd image from ‘filtered image’ pixel values corresponding to the pixel values of the ‘segmented image’
+
+#im calling segmented image “image_1” and filtered image “image_2”. New image is “image_3”
+
+Image 3 = ndarray(120,120)
+For i in range(0,120):
+	For j in range(0,120):
+	Pixel_i_j = image_1[i,j]
+#is this pixel = object num?
+If pixel_i_j EQ object_num:
+	Image_3[i,j] = image_2[i,j]
+
+#now save image_3
+
+Idl code for obtaining object_num:
+
+  pro make_cut_image
+  image_address = 'C:\Users\User\Documents\sextractor-2.25.0\config'
+  
+  ;read text document
+  ;
+  cd, image_address
+  READCOL,'7-cat.txt',F='F', number, xwin_image,ywin_image
+  
+n_rows = n_elements(number)
+  for i = 0, n_rows-1 do begin
+    if xwin_image[i] GE 55 AND xwin_image[i] LE 65 then begin
+      if ywin_image[i] GE 55 AND ywin_image[i] LE 65 then begin
+        object_num = i+1
+        endif
+        endif
+ endfor
+        
+ print,object_num
+ End
+
+
+FULL IDL CODE TO PROCESS A SINGLE IMAGE: (goal is to keep only objects in the center of image (within 5 pixels of center))
+
+  pro make_cut_image
+  image_address = 'C:\Users\User\Documents\sextractor-2.25.0\config'
+  
+  ;read text document
+  ;
+  cd, image_address
+  READCOL,'2-cat.txt',F='F', number, xwin_image,ywin_image
+  
+n_rows = n_elements(number)
+  for i = 0, n_rows-1 do begin
+    if xwin_image[i] GE 55 AND xwin_image[i] LE 65 then begin
+      if ywin_image[i] GE 55 AND ywin_image[i] LE 65 then begin
+        object_num = i+1
+        endif
+        endif
+ endfor
+        
+ print,object_num
+
+ 
+ 
+ ;read image_1:
+ 
+
+ image_1 = READFITS('2-check.fits') 
+  image_2 = READFITS('2-check_filtered.fits') 
+  image_3 = make_array(120,120, /float)
+ ;create new segmented image with only 1 object:
+ for j = 0,120-1 do begin
+    for i = 0, 120-1 do begin
+    pixel_i_j = image_1[i,j]
+    if pixel_i_j EQ object_num then begin
+      image_3[i,j] = image_2[i,j]
+      endif
+    endfor
+ endfor
+ 
+ im3 = image(image_3)
+ im2 = image(image_2)
+ im1 = image(image_1)
+ stop
+  end
+
+
+WOW THAT WAS FAST. now I need to iterate through all images in the directory. Do this tomorrow.
+
+Example of all images:
+
+
+
+Here’s another example:
+
+
+Process for processing g band first:
+Move g band images into sextractor folder
+Run sextractor on all g band images to obtain filtered check image
+for i in {2..14721}; do sex $i-cutout-HSC-G-9813-pdr2_wide.fits -c default.sex -catalog_name $i-cat.txt -checkimage_name $i-check_filtered.fits -xml_name $i-xmlfile.xml; done
+
+Default.sex is this:
+
+# Default configuration file for SExtractor 2.25.0
+# EB 2021-05-31
+#
+XMIN_IMAGE 57.5
+XMAX_IMAGE 62.5
+YMIN_IMAGE 57.5
+YMAX_IMAGE 62.5
+NUMBER    1  
+
+X_IMAGE 60
+Y_IMAGE 60
+#-------------------------------- Catalog ------------------------------------
+ 
+CATALOG_NAME     test.txt       # name of the output catalog
+CATALOG_TYPE     ASCII_HEAD     # NONE,ASCII,ASCII_HEAD, ASCII_SKYCAT,
+                                # ASCII_VOTABLE, FITS_1.0 or FITS_LDAC
+PARAMETERS_NAME  default.param  # name of the file containing catalog contents
+ 
+#------------------------------- Extraction ----------------------------------
+ 
+DETECT_TYPE      CCD            # CCD (linear) or PHOTO (with gamma correction)
+DETECT_MINAREA   5              # min. # of pixels above threshold
+DETECT_THRESH    1.5            # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+ANALYSIS_THRESH  1.5            # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+ 
+FILTER           Y              # apply filter for detection (Y or N)?
+FILTER_NAME      gauss_1.5_3x3.conv   # name of the file containing the filter
+ 
+DEBLEND_NTHRESH  32             # Number of deblending sub-thresholds
+DEBLEND_MINCONT  0.005          # Minimum contrast parameter for deblending
+ 
+CLEAN            Y              # Clean spurious detections? (Y or N)?
+CLEAN_PARAM      1.0            # Cleaning efficiency
+ 
+MASK_TYPE        CORRECT        # type of detection MASKing: can be one of
+                                # NONE, BLANK or CORRECT
+ 
+#------------------------------ Photometry -----------------------------------
+ 
+PHOT_APERTURES   5              # MAG_APER aperture diameter(s) in pixels
+PHOT_AUTOPARAMS  2.5, 3.5       # MAG_AUTO parameters: <Kron_fact>,<min_radius>
+PHOT_PETROPARAMS 2.0, 3.5       # MAG_PETRO parameters: <Petrosian_fact>,
+                                # <min_radius>
+ 
+SATUR_LEVEL      50000.0        # level (in ADUs) at which arises saturation
+SATUR_KEY        SATURATE       # keyword for saturation level (in ADUs)
+ 
+MAG_ZEROPOINT    0.0            # magnitude zero-point
+MAG_GAMMA        4.0            # gamma of emulsion (for photographic scans)
+GAIN             0.0            # detector gain in e-/ADU
+GAIN_KEY         GAIN           # keyword for detector gain in e-/ADU
+PIXEL_SCALE      0.17            # size of pixel in arcsec (0=use FITS WCS info)
+ 
+#------------------------- Star/Galaxy Separation ----------------------------
+ 
+SEEING_FWHM      1.2            # stellar FWHM in arcsec
+STARNNW_NAME     default.nnw    # Neural-Network_Weight table filename
+ 
+#------------------------------ Background -----------------------------------
+ 
+BACK_SIZE        64             # Background mesh: <size> or <width>,<height>
+BACK_FILTERSIZE  3              # Background filter: <size> or <width>,<height>
+ 
+BACKPHOTO_TYPE   GLOBAL         # can be GLOBAL or LOCAL
+ 
+#------------------------------ Check Image ----------------------------------
+ 
+#CHECKIMAGE_TYPE  -BACKGROUND           # can be NONE, BACKGROUND, BACKGROUND_RMS,
+                                # MINIBACKGROUND, MINIBACK_RMS, -BACKGROUND,
+                                # FILTERED, OBJECTS, -OBJECTS, SEGMENTATION,
+                                # or APERTURES
+#CHECKIMAGE_NAME  check.fits     # Filename for the check-image
+ 
+#--------------------- Memory (change with caution!) -------------------------
+ 
+MEMORY_OBJSTACK  3000           # number of objects in stack
+MEMORY_PIXSTACK  300000         # number of pixels in stack
+MEMORY_BUFSIZE   1024           # number of lines in buffer
+ 
+#----------------------------- Miscellaneous ---------------------------------
+ 
+VERBOSE_TYPE     NORMAL         # can be QUIET, NORMAL or FULL
+HEADER_SUFFIX    .head          # Filename extension for additional headers
+WRITE_XML        Y              # Write XML file (Y/N)?
+XML_NAME         sex.xml        # Filename for XML output  
+DETECT_THRESH 3
+NUMBER    1               Running object number       
+DETECT_THRESH 3
+CATALOG_NAME output_image
+CATALOG_TYPE ASCII_HEAD
+CHECKIMAGE_TYPE  FILTERED  
+#CHECKIMAGE_TYPE  SEGMENTATION 
+ERRXY_IMAGE 5
+
+
+Run sextractor again on all g band images to obtain segmented check image
+
+for i in {2..14721}; do sex $i-cutout-HSC-G-9813-pdr2_wide.fits -c default.sex -catalog_name $i-cat.txt -checkimage_name $i-check_segmented.fits -xml_name $i-xmlfile.xml; done
+
+> Replace “CHECKIMAGE_TYPE  FILTERED”  with “CHECKIMAGE_TYPE  SEGMENTATION” in default.sex
+
+
+Run idl to obtain cleaned images
+
+
+
+6/6/21 processed G band, now doing r band:
+
+for i in {2..52592}; do sex $i-cutout-HSC-R-****-pdr2_wide.fits -c default.sex -catalog_name $i-r_cat.txt -checkimage_name $i-g_check_filtered.fits; done
+
+Now update params file and do segmented:
+
+for i in {2..52592}; do sex $i-cutout-HSC-R-****-pdr2_wide.fits -c default.sex -catalog_name $i-r_cat.txt -checkimage_name $i-g_check_segmented.fits; done
+
+
+**** note, i accidentally named the filtered images and segmented images with the ‘g’ label, but they are actually for r. I should rename these files with the command line. For now I am just leaving them in the r folder.
+
+6/7/21 processing i-band now
+
+for i in {2..52592}; do sex $i-cutout-HSC-I-****-pdr2_wide.fits -c default.sex -checkimage_name $i-I_check_filtered.fits; done
+
+
+for i in {2..52592}; do sex $i-cutout-HSC-I-****-pdr2_wide.fits -c default.sex -catalog_name $i-I_cat.txt -checkimage_name $i-I_check_segmented.fits; done
+
+For z band
+
+
+for i in {2..52592}; do sex $i-cutout-HSC-Z-****-pdr2_wide.fits -c default.sex -checkimage_name $i-Z_check_filtered.fits; done
+
+
+for i in {2..52592}; do sex $i-cutout-HSC-Z-****-pdr2_wide.fits -c default.sex -catalog_name $i-Z_cat.txt -checkimage_name $i-Z_check_segmented.fits; done
+
+
+For y band
+
+
+for i in {2..52592}; do sex $i-cutout-HSC-Y-****-pdr2_wide.fits -c default.sex -checkimage_name $i-Y_check_filtered.fits; done
+
+
+for i in {2..52592}; do sex $i-cutout-HSC-Y-****-pdr2_wide.fits -c default.sex -catalog_name $i-Y_cat.txt -checkimage_name $i-Y_check_segmented.fits; done
+
