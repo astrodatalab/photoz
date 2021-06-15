@@ -1,0 +1,16 @@
+make_cut_image.pro
+
+input: 
+
+for a single galaxy in a single photometric band,
+
+cat txt file specifying labeled objects in the image
+HSC filtered image
+HSC segmented image
+HSC full image
+
+output:
+HSC full image trimmed to contain only the central object within 5 pixels of the center. 
+
+
+The program identifies the central object, finds the corresponding object label, and then filters the full image to contain only the central object.
