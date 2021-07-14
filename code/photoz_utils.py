@@ -9,9 +9,9 @@ import scipy.stats as stats
 
 v1_photoz_path = '/data/HSC/HSC_IMAGES_FIXED/HSC_photozdata_full_header_trimmed.csv'
 v2_photoz_path = '/data/HSC_v2/HSC_photozdata_with_spectra.csv'
+v3_photoz_path = '/data/HSC/HSC_v3/matched_photozdata_with_spectrozdata_full_unfiltered_readable.csv'
 
-
-def import_photoz_data(path='v2'):
+def import_photoz_data(path='v3'):
     """
     Import the data table of band magnitudes and spectroscopic redshift.
 
@@ -25,6 +25,8 @@ def import_photoz_data(path='v2'):
         df = pd.read_csv(v1_photoz_path)
     elif (path == 'v2'):
         df = pd.read_csv(v2_photoz_path)
+    elif (path == 'v3'):
+        df = pd.read_csv(v3_photoz_path)
     else:
         df = pd.read_csv(path)
     return df
@@ -65,48 +67,120 @@ def split_photoz_data(df, test_size=0.2):
     test_size: float [optional]
     RETURN: tuple
     """
-
     X = df[['g_mag', 'r_mag', 'i_mag', 'z_mag', 'y_mag']]
     y = df['zspec']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
     return X_train, X_test, y_train, y_test
 
 
-def evaluate_point_estimates(z_true, z_pred):
+def plot_results(z_true, z_pred):
+    """
+    Plot the predicted vs. true redshifts and residuals.
+    
+    z_true: (N,) array-like
+    z_pred: (N,) array-like
+    RETURN: None
+    """
+    fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+    # predicted vs actual
+    g = sns.scatterplot(x=z_true, y=z_pred, ax=axes[0,0])
+    g.plot([0,4], [0,4], color='red')
+    g.set(xlabel='True redshift', ylabel='Predicted redshift')
+    # residual vs actual
+    g = sns.scatterplot(x=z_true, y=z_pred-z_true, ax=axes[0,1])
+    g.plot([0,4], [0,0], color='red')
+    g.set(xlabel='True redshift', ylabel='Prediction residual')
+    # predicted, actual distributions
+    g = sns.histplot([z_true, z_pred], bins=100, ax=axes[1,0])
+    g.legend(labels=['True redshift', 'Predicted redshift'])
+    g.set(xlabel='Redshift')
+    # residual distribution
+    g = sns.histplot(z_pred-z_true, bins=100, ax=axes[1,1])
+    g.set(xlabel='Prediction residual')
+    plt.show()
+
+
+def point_metrics(z_true, z_pred):
     """
     Evaluate the accuracy between true redshifts and the model's predicted
     point-estimates of each true redshift.
 
     z_true: (N,) array-like
     z_pred: (N,) array-like
-    RETURN: None
+    RETURN: dict
     """
     delz = (z_pred-z_true)/(1+z_true)
-
     r2 = r2_score(z_true, z_pred)
     mse = mean_squared_error(z_true, z_pred)
     bias = sum(delz)/len(delz)
     disp = 1.48*stats.median_abs_deviation(delz)
-    print(f'R squared: {r2}\nMean squared error: {mse}\nBias: {bias}\nConventional dispersion: {disp}')
-    
-    fig, axes = plt.subplots(2, 2, figsize=(12, 12))
-    
-    g = sns.scatterplot(x=z_true, y=z_pred, ax=axes[0,0])
-    g.plot([0,4], [0,4], color='red')
-    g.set(xlabel='True redshift', ylabel='Predicted redshift')
+    metrics = {
+        'r2': r2,
+        'mse': mse,
+        'bias': bias,
+        'dispersion': disp
+    }
+    return metrics
 
-    g = sns.scatterplot(x=z_true, y=z_pred-z_true, ax=axes[0,1])
-    g.plot([0,4], [0,0], color='red')
-    g.set(xlabel='True redshift', ylabel='Prediction residual')
+
+def density_metrics(z_true, z_pred_densities):
+    """
+    Evaluate the accuracy between true redshifts and the model's
+    predicted density estimates.
+
+    z_true: (N,) array-like
+    z_pred_densities: (N, M) array-like
+        Each row corresponds to a galaxy, containing an (M,) array of guesses
+        outputted by the model.
+    RETURN: dict
+    """
+    N = len(z_pred_densities)
+    M = len(z_pred_densities[0])
+    PIT  = []
+    CRPS = []
+    for z, z_pdf in zip(z_true, z_pred_densities):
+        PIT.append(len(np.where(z_pdf<z)[0])*1.0/M)
+        for j in range(M):
+            z_check = 4.0*j/200
+            if z_check < z:
+                CRPS.append(((len(np.where(z_pdf<z_check)[0])*1.0/M)**2)*(4.0/200))
+            else:
+                CRPS.append(((len(np.where(z_pdf<z_check)[0])*1.0/M-1)**2)*(4.0/200))
+    metrics = {
+        'pit': PIT,
+        'crps': CRPS
+    }
+    return metrics
+
+
+def plot_density_metrics(PIT, CRPS):
+    """
+    Plot the metrics of the model's predicted density estimates of redshifts.
+
+    z_true: (N,) array-like
+    z_pred_densities: (N, M) array-like
+        Each row corresponds to a galaxy, containing an (M,) array of guesses
+        outputted by the model.
+    RETURN: None
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    g = sns.histplot(PIT, bins = 50, ax=axes[0])
+    g.set(xlabel='Probability integral transform', ylabel='Count')
+    g = sns.histplot(CRPS, bins = 50, ax=axes[1])
+    g.set(xlabel='Continuous ranked probability score', ylabel='Count')
+
     
-    g = sns.histplot([z_true, z_pred], bins=100, ax=axes[1,0])
-    g.legend(labels=['True redshift', 'Predicted redshift'])
-    g.set(xlabel='Redshift')
-    
-    g = sns.histplot(z_pred-z_true, bins=100, ax=axes[1,1])
-    g.set(xlabel='Prediction residual')
-    
-    plt.show()
+def is_outlier(z_true, z_pred):
+    delz = abs(z_pred - z_true)-0.15*(1+z_true)
+    is_outlier = (delz > 0)
+    return is_outlier
+
+
+def outlier_rate(z_true, z_pred):
+    is_outlier = is_outlier(z_true, z_pred)
+    num_outliers = sum(is_outlier)*1.0
+    outlier_rate = num_outliers/len(z_true)
+    return outlier_rate
 
 
 def evaluate_interval_estimates(z_true, z_true_err, z_pred, z_pred_err):
@@ -121,47 +195,3 @@ def evaluate_interval_estimates(z_true, z_true_err, z_pred, z_pred_err):
     RETURN: None
     """
     pass
-
-
-def evaluate_density_estimates(z_true, z_pred_densities):
-    """
-    Evaluate the accuracy between true redshifts/redshift errors and the model's
-    predicted interval estimates.
-
-    z_true: (N,) array-like
-    z_pred_densities: (N, M) array-like
-        Each row corresponds to a galaxy, containing an (M,) array of guesses
-        outputted by the model.
-    RETURN: None
-    """
-    N = len(z_pred_densities)
-    M = len(z_pred_densities[0])
-    PIT  = []
-    CRPS = []
-    for z, z_pdf in zip(z_true, z_pred_densities):
-        PIT.append(len(np.where(z_pdf<z)[0])*1.0/M)
-        for j in range(M):
-            z_check = 4.0*j/200
-            if z_check < z:
-                CRPS.append(((len(np.where(z_pdf<z_check)[0])*1.0/M)**2)*(4.0/200))
-            else:
-                CRPS.append(((len(np.where(z_pdf<z_check)[0])*1.0/M-1)**2)*(4.0/200))
-    
-    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
-    
-    g = sns.histplot(PIT, bins = 50, ax=axes[0])
-    g.set(xlabel='Probability integral transform', ylabel='Count')
-    
-    g = sns.histplot(CRPS, bins = 50, ax=axes[1])
-    g.set(xlabel='Continuous ranked probability score', ylabel='Count')
-
-    
-def evaluate_point_outliers(z_true, z_pred):
-    delz = abs(z_pred - z_true)-0.15*(1+z_true)
-    is_outlier = (delz > 0)
-    num_outliers = sum(is_outlier)*1.0
-    outlier_rate = num_outliers/len(z_true)
-    L = 1-(1/(1+(delz/0.15)**2))
-    print(f'Outlier rate: {outlier_rate}\nLoss function: {L}')
-    
-    
