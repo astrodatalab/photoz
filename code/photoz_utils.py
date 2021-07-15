@@ -8,7 +8,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 import scipy.stats as stats
 
 v1_photoz_path = '/data/HSC/HSC_IMAGES_FIXED/HSC_photozdata_full_header_trimmed.csv'
-v2_photoz_path = '/data/HSC_v2/HSC_photozdata_with_spectra.csv'
+v2_photoz_path = '/data/HSC/HSC_v2/HSC_photozdata_with_spectra.csv'
 v3_photoz_path = '/data/HSC/HSC_v3/matched_photozdata_with_spectrozdata_full_unfiltered_readable.csv'
 
 def import_photoz_data(path='v3'):
@@ -71,33 +71,6 @@ def split_photoz_data(df, test_size=0.2):
     y = df['zspec']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
     return X_train, X_test, y_train, y_test
-
-
-def plot_results(z_true, z_pred):
-    """
-    Plot the predicted vs. true redshifts and residuals.
-    
-    z_true: (N,) array-like
-    z_pred: (N,) array-like
-    RETURN: None
-    """
-    fig, axes = plt.subplots(2, 2, figsize=(12, 12))
-    # predicted vs actual
-    g = sns.scatterplot(x=z_true, y=z_pred, ax=axes[0,0])
-    g.plot([0,4], [0,4], color='red')
-    g.set(xlabel='True redshift', ylabel='Predicted redshift')
-    # residual vs actual
-    g = sns.scatterplot(x=z_true, y=z_pred-z_true, ax=axes[0,1])
-    g.plot([0,4], [0,0], color='red')
-    g.set(xlabel='True redshift', ylabel='Prediction residual')
-    # predicted, actual distributions
-    g = sns.histplot([z_true, z_pred], bins=100, ax=axes[1,0])
-    g.legend(labels=['True redshift', 'Predicted redshift'])
-    g.set(xlabel='Redshift')
-    # residual distribution
-    g = sns.histplot(z_pred-z_true, bins=100, ax=axes[1,1])
-    g.set(xlabel='Prediction residual')
-    plt.show()
 
 
 def point_metrics(z_true, z_pred):
