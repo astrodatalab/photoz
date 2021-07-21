@@ -52,8 +52,6 @@ def clean_photoz_data(df):
     # remove NAs
     df.replace([-99., -99.9, np.inf], np.nan, inplace=True)
     df.dropna(inplace=True)
-    # summary statistics
-    print(df.describe())
     return df
 
 
@@ -71,100 +69,3 @@ def split_photoz_data(df, test_size=0.2):
     y = df['zspec']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
     return X_train, X_test, y_train, y_test
-
-
-def point_metrics(z_true, z_pred):
-    """
-    Evaluate the accuracy between true redshifts and the model's predicted
-    point-estimates of each true redshift.
-
-    z_true: (N,) array-like
-    z_pred: (N,) array-like
-    RETURN: dict
-    """
-    delz = (z_pred-z_true)/(1+z_true)
-    r2 = r2_score(z_true, z_pred)
-    mse = mean_squared_error(z_true, z_pred)
-    bias = sum(delz)/len(delz)
-    disp = 1.48*stats.median_abs_deviation(delz)
-    metrics = {
-        'r2': r2,
-        'mse': mse,
-        'bias': bias,
-        'dispersion': disp
-    }
-    return metrics
-
-
-def density_metrics(z_true, z_pred_densities):
-    """
-    Evaluate the accuracy between true redshifts and the model's
-    predicted density estimates.
-
-    z_true: (N,) array-like
-    z_pred_densities: (N, M) array-like
-        Each row corresponds to a galaxy, containing an (M,) array of guesses
-        outputted by the model.
-    RETURN: dict
-    """
-    N = len(z_pred_densities)
-    M = len(z_pred_densities[0])
-    PIT  = []
-    CRPS = []
-    for z, z_pdf in zip(z_true, z_pred_densities):
-        PIT.append(len(np.where(z_pdf<z)[0])*1.0/M)
-        for j in range(M):
-            z_check = 4.0*j/200
-            if z_check < z:
-                CRPS.append(((len(np.where(z_pdf<z_check)[0])*1.0/M)**2)*(4.0/200))
-            else:
-                CRPS.append(((len(np.where(z_pdf<z_check)[0])*1.0/M-1)**2)*(4.0/200))
-    metrics = {
-        'pit': PIT,
-        'crps': CRPS
-    }
-    return metrics
-
-
-def plot_density_metrics(PIT, CRPS):
-    """
-    Plot the metrics of the model's predicted density estimates of redshifts.
-
-    z_true: (N,) array-like
-    z_pred_densities: (N, M) array-like
-        Each row corresponds to a galaxy, containing an (M,) array of guesses
-        outputted by the model.
-    RETURN: None
-    """
-    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
-    g = sns.histplot(PIT, bins = 50, ax=axes[0])
-    g.set(xlabel='Probability integral transform', ylabel='Count')
-    g = sns.histplot(CRPS, bins = 50, ax=axes[1])
-    g.set(xlabel='Continuous ranked probability score', ylabel='Count')
-
-    
-def is_outlier(z_true, z_pred):
-    delz = abs(z_pred - z_true)-0.15*(1+z_true)
-    is_outlier = (delz > 0)
-    return is_outlier
-
-
-def outlier_rate(z_true, z_pred):
-    is_outlier = is_outlier(z_true, z_pred)
-    num_outliers = sum(is_outlier)*1.0
-    outlier_rate = num_outliers/len(z_true)
-    return outlier_rate
-
-
-def evaluate_interval_estimates(z_true, z_true_err, z_pred, z_pred_err):
-    """
-    Evaluate the accuracy between true redshifts/redshift errors and the model's
-    predicted interval estimates.
-
-    z_true: (N,) array-like
-    z_true_err: (N,) array-like
-    z_pred: (N,) array-like
-    z_pred_err: (N,) array-like
-    RETURN: None
-    """
-    pass
