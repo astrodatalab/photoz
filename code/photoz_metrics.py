@@ -153,7 +153,7 @@ def get_density_metrics(z_photo_vectors, z_spec, binned=False):
 
 def plot_predictions(z_photo, z_spec):
     sns.set(rc={'figure.figsize':(10,10)})
-    sns.histplot(x=z_spec, y=z_photo, cmap='viridis')
+    sns.histplot(x=z_spec, y=z_photo, cmap='viridis', cbar=True)
     sns.lineplot(x=[0,4], y=[0,4])
     plt.xlabel('True redshift')
     plt.ylabel('Predicted redshift')
