@@ -2,7 +2,7 @@
 
 All the filters are tried out on all_specz_flag_forced_forced2_spec_z_matched_online.csv with 801246 galaxies.
 
-[RF_big_data.ipynb](filters.md)
+[code/RF_big_data.ipynb](filters.md)
 
 
 ### 1. specz_redshift < 4
