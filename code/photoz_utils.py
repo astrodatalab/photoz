@@ -39,7 +39,7 @@ def import_photoz_data(path=None, version=None):
     return df
 
 
-def clean_photoz_data(df, errors=False, filters=None):
+def clean_photoz_data(df, errors=False, filters=None, scaled=False):
     """
     Clean the imported dataset. Columns are the band magnitudes, spectroscopic
     redshift, and optionally spectroscopic redshift error. Returns the cleaned
@@ -53,7 +53,9 @@ def clean_photoz_data(df, errors=False, filters=None):
         later for probabilistic/interval redshift estimation.
     filters: list[int]
         List of ints corresponding to the filters to use. The filters.md file
-        contains the list of the applicable filters. If None, 
+        contains the list of the applicable filters. If None, no cuts applied.
+    scaled: bool
+        Whether to scale the magnitude data, min-max across all bands.
     """
     
     # DEFINE CUTS
@@ -68,25 +70,31 @@ def clean_photoz_data(df, errors=False, filters=None):
             & (df['y_cmodel_mag'] > 0) & (df['y_cmodel_mag'] < 50)
 
     # PERFORM CUTS
-    if (filters is None):
-        cut_df = df
-    else:
+    if (filters is not None):
         cuts = (cut_1 if 1 in filters else True)    \
                 & (cut_2 if 2 in filters else True) \
                 & (cut_3 if 3 in filters else True) \
                 & (cut_4 if 4 in filters else True) \
                 & (cut_5 if 5 in filters else True)
-        cut_df = df[cuts]
+        df = df[cuts]
     
     # NA CUTS
-    na_df = cut_df.replace([-99., -99.9, np.inf], np.nan).dropna()
+    df = df.replace([-99., -99.9, np.inf], np.nan)
+    df = df.dropna()
 
     # SELECT COLUMNS
-    clean_df = na_df[['g_cmodel_mag', 'r_cmodel_mag', 'i_cmodel_mag', 'z_cmodel_mag', 'y_cmodel_mag', 'specz_redshift']]
-    clean_df.columns = ['g_mag', 'r_mag', 'i_mag', 'z_mag', 'y_mag', 'z_spec']
+    df = df[['g_cmodel_mag', 'r_cmodel_mag', 'i_cmodel_mag', 'z_cmodel_mag', 'y_cmodel_mag', 'specz_redshift']]
+    df.columns = ['g_mag', 'r_mag', 'i_mag', 'z_mag', 'y_mag', 'z_spec']
     if (errors):
-        clean_df = clean_df.assign(z_spec_err=na_df.loc[:,'specz_redshift_err'])
-    return clean_df
+        df = df.assign(z_spec_err=na_df.loc[:,'specz_redshift_err'])
+    
+    # NORMALIZATION
+    if (scaled):
+        X = df[['g_mag', 'r_mag', 'i_mag', 'z_mag', 'y_mag']]
+        X_norm = (X - X.values.min()) / (X.values.max() - X.values.min())
+        df[['g_mag', 'r_mag', 'i_mag', 'z_mag', 'y_mag']] = X_norm
+    
+    return df
 
 
 def split_photoz_data(df, test_size=0.2):
