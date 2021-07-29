@@ -2,7 +2,7 @@
 
 All the filters are tried out on all_specz_flag_forced_forced2_spec_z_matched_online.csv with 801246 galaxies.
 
-[One example of using these filters](code/RF_big_data.ipynb)
+[One example of using these filters](../code/RF_big_data.ipynb)
 
 
 ### 1. specz_redshift < 4
@@ -28,3 +28,7 @@ that intersted in galaxies with extremely small redshift.
 - This is trying to get rid of all the nan and infinity in the dataset. Galaxies with entry nan is rare, but they will
 ruin the model training process.
 - filter out 0.0145% galaxies. (116)
+
+### 6. specz_flag_homogeneous == True
+- True homogenized flag means secure. HSC paper also uses this filter
+- filter out 16% galaxies. (129901)
