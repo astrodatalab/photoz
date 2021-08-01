@@ -7,6 +7,8 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from astropy.stats import biweight_location, biweight_midvariance
 from scipy.stats import median_abs_deviation
+from sklearn.metrics import mean_squared_error
+
 
 
 ######################
@@ -334,16 +336,19 @@ def get_point_metrics(z_photo, z_spec, binned=False):
         bias_conv = calculate_bias(binned_z_pred, binned_z_true, conventional=True)
         scatter_conv = calculate_scatter(binned_z_pred, binned_z_true, conventional=True)
         outlier_conv = calculate_outlier_rate(binned_z_pred, binned_z_true, conventional=True)
+        
+        # MSE
+        mse = mean_squared_error(binned_z_true,binned_z_pred)
 
         # ADD TO ROW
         metrics_list.append([
             zspec_bin, count, L, bias_bw, bias_conv, 
-            scatter_bw, scatter_conv, outlier_bw, outlier_conv])
+            scatter_bw, scatter_conv, outlier_bw, outlier_conv,mse])
 
     # DATAFRAME CONVERSION
     metrics_df = pd.DataFrame(metrics_list, columns=[
         'zspec_bin', 'count', 'L', 'bias_bw', 'bias_conv',
-        'scatter_bw', 'scatter_conv', 'outlier_bw', 'outlier_conv'])
+        'scatter_bw', 'scatter_conv', 'outlier_bw', 'outlier_conv','mse'])
     return metrics_df
 
 
