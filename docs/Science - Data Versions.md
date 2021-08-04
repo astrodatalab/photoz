@@ -18,6 +18,8 @@ Same filters as HSC_v4 except with extra conditions on duplicates:
 1. For galaxies where there are multiple matches to one spectroscopic redshift, select the first matching HSC galaxy.
 2. For the case where a single HSC galaxy matches multiple spectroscopic values, remove that galaxy.
 
+NOTE: also, the first line no longer contains the comment # so the column is now properly named 'object_id'
+
 number of duplicate specz_name galaxies:  565185
 number of unique specz_name galaxies:  291231
 number of duplicate obj_id galaxies:  3457
