@@ -26,3 +26,10 @@ number of duplicate obj_id galaxies:  3457
 number of unique obj_id galaxies:  289483
 number of galaxies to output 287774
 outputfile: /mnt/data/HSC/HSC_v5/HSC_v5.csv
+
+### HSC_v6
+
+Same filters as HSC_v5 with conditions on specz_i_mag:
+
+1. specz_i_mag > 0 # this is to get rid of negative values
+2. specz_i_mag < 28 # this matches the faintest i band magnitude from photometric measurements, which is about 27.9
