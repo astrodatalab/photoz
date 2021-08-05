@@ -32,3 +32,12 @@ ruin the model training process.
 ### 6. specz_flag_homogeneous == True
 - True homogenized flag means secure. HSC paper also uses this filter
 - filter out 16% galaxies. (129901)
+
+### 7.enforcing specz_name and object_id to be unique
+- For galaxies where there are multiple matches to one spectroscopic redshift, select the first matching HSC galaxy.
+- For the case where a single HSC galaxy matches multiple spectroscopic values, remove that galaxy.
+
+### 8. 0 < specz_i_mag < 28
+- This is trying to get rid of the bad points for which specz_i_mags are around -10000.
+- This also matches the faintest i band magnitude from photometric measurement, which is around 27.9.
+
