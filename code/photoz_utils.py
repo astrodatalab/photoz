@@ -3,6 +3,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from collections import defaultdict
+from scipy.spatial import cKDTree
+#from astropy.coordinates import SkyCoord
+#import astropy.units as u
 
 from sklearn.model_selection import train_test_split
 from astropy.stats import biweight_location, biweight_midvariance
@@ -125,6 +129,84 @@ def split_photoz_data(df, test_size=0.2):
     # SPLIT WITHOUT ERROR
     X_train, X_test, z_train, z_test = train_test_split(X, z, test_size=test_size)
     return X_train, X_test, z_train, z_test
+
+
+def filter_nearest_galaxies(input_csv,output_csv):
+    '''
+    Examine the data to filter out duplicates based on their positions. TBD
+
+    Inputs:
+    ------
+    input_csv - input csv table. Should be the csv format for HSC data 
+                that our group has been using
+    
+    Outputs:
+    --------
+    output_csv - output csv file
+
+    '''
+    tab = read_csv(input_csv)
+
+
+
+def list_duplicates(seq):
+    '''
+    Returns a generator with the value and the counts of each
+    non-unique element of the input array.
+
+    Inputs:
+    --------
+    seq - array of values
+
+    Outputs:
+    --------
+    an interator that returns a list  [item, indices] which are 
+    the indices that each duplicate item can be found. 
+
+    '''
+    tally = defaultdict(list)
+    for i,item in enumerate(seq):
+        tally[item].append(i)
+    return ((key,locs) for key,locs in tally.items() 
+                            if len(locs)>1)
+
+def find_duplicate_galaxies(tab,match_name='specz_name'):
+    '''
+    Takes in a data frame and determines which values are duplicates. 
+    By default will look at the specz_name for duplicates. Will return
+    boolean arrays indicating which rows are duplicates and which 
+    unique values to use. 
+
+    Inputs:
+    -------
+    tab - a pandas data frame 
+
+    Keywords:
+    ---------
+    match_name - the column to use for finding duplicates (default: 'specz_name')
+
+    Output:
+    ------
+    duplicate_bool, unique_bool - two boolean arrays that indicate 
+    which rows are duplicates and which galaxies to use. For galaxies that
+    are duplicates, it will assign the first instance of the galaxy to use
+    
+    '''
+
+    duplicate_gen = list_duplicates(tab[match_name])
+    
+    duplicate_bool = np.zeros(len(tab),dtype=bool)   # to indicate the galaxy is duplicate
+    use_unique_bool = np.ones(len(tab),dtype=bool)   # to indicate the galaxy to use that is unique
+
+    # iterate over the duplicates and just assign one of them to be the true match to the specz
+    for name, ind in duplicate_gen:
+
+        duplicate_bool[ind] = True
+        # arbitrarily choose the first duplicate to the T one, set all the others to False
+        use_unique_bool[ind[1:]] = False
+        
+
+    return duplicate_bool, use_unique_bool
 
 
 ##########################
