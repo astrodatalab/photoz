@@ -29,6 +29,27 @@ average loss: 0.085089
 ![image](https://user-images.githubusercontent.com/46472635/127441624-27afadf9-99e6-493d-b49c-5e4c928979da.png)
 ![image](https://user-images.githubusercontent.com/46472635/127441739-b7670937-3b96-4d74-8e93-6250b00b6e7e.png)
 
+### Random Forest model HSC_v6
+[notebook for random forest model](../code/RF_big_data.ipynb)
+
+[results for random forest model](../results/RF_results_v6.csv)
+
+- dataset: HSC_v6.csv
+
+- train test split: 0.2
+
+- metrics:\
+biweight bias: 0.001666\
+conventional bias: 0.002388\
+biweight scatter: 0.037309\
+conventional scatter: 0.030997\
+biweighht outlier rate: 0.179728\
+conventional outlier rate: 0.098078\
+average loss: 0.127516\
+mse: 0.090831
+
+![image](https://user-images.githubusercontent.com/46472635/128378345-5684c871-d426-4190-85e2-c8d161082b82.png)
+![image](https://user-images.githubusercontent.com/46472635/128378443-a72490a6-d606-4b7e-9221-bd65b413a23b.png)
 
 
 ### XGBoost model
