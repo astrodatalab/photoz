@@ -103,3 +103,8 @@ biweighht outlier rate: 0.150923\
 conventional outlier rate: 0.065764\
 average loss: 0.098334\
 mse: 0.083894
+
+![image](https://user-images.githubusercontent.com/46472635/128579476-6161375d-63d1-4a6f-ab0a-f15c9dad2eba.png)
+![image](https://user-images.githubusercontent.com/46472635/128579488-fdd896f3-598b-4591-bc72-6b12e32ea7b8.png)
+
+
