@@ -74,3 +74,37 @@ average loss: 0.147154
 ![image](https://user-images.githubusercontent.com/46472635/127443446-2525d095-3587-4425-98c8-0921b84aa7ad.png)
 ![image](https://user-images.githubusercontent.com/46472635/127443520-659ecdd5-b526-4ea8-a10c-0f7c0f4e7e50.png)
 
+### Neural Network
+
+[notebook for XGBoost model](../code/example_notebook_producing_nans.ipynb )
+
+
+[results for XBGoost model](../results/NN_regression_results_v6.csv)
+
+- dataset: HSC_v6
+
+- train test split: 0.2
+
+- model: input_ = tf.keras.layers.Input(shape=x_train.shape[1:])\
+hidden1 = tf.keras.layers.Dense(400, activation="relu")(input_)\
+hidden2 = tf.keras.layers.Dense(400, activation="relu")(hidden1)\
+hidden3 = tf.keras.layers.Dense(400, activation="relu")(hidden2)\
+hidden4 = tf.keras.layers.Dense(400, activation="relu")(hidden3)\
+concat = tf.keras.layers.Concatenate()([input_, hidden4])\
+output = tf.keras.layers.Dense(1)(concat)\
+model = tf.keras.Model(inputs=[input_], outputs=[output])\
+
+- metrics:\
+biweight bias:-0.002323\
+conventional bias: -0.002193\
+biweight scatter: 0.032684\
+conventional scatter: 0.027467\
+biweighht outlier rate: 0.150923\
+conventional outlier rate: 0.065764\
+average loss: 0.098334\
+mse: 0.083894
+
+![image](https://user-images.githubusercontent.com/46472635/128579476-6161375d-63d1-4a6f-ab0a-f15c9dad2eba.png)
+![image](https://user-images.githubusercontent.com/46472635/128579488-fdd896f3-598b-4591-bc72-6b12e32ea7b8.png)
+
+
