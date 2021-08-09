@@ -75,6 +75,7 @@ average loss: 0.147154
 ![image](https://user-images.githubusercontent.com/46472635/127443520-659ecdd5-b526-4ea8-a10c-0f7c0f4e7e50.png)
 
 
+[results for XBGoost model with data v6](../results/XGBoost_results_v6.csv)
 - dataset: HSC_v6.csv
 
 - train test split: 0.2
@@ -125,6 +126,8 @@ mse: 0.083894
 ![image](https://user-images.githubusercontent.com/46472635/128579476-6161375d-63d1-4a6f-ab0a-f15c9dad2eba.png)
 ![image](https://user-images.githubusercontent.com/46472635/128579488-fdd896f3-598b-4591-bc72-6b12e32ea7b8.png)
 
+
+[results for XBGoost model](../results/NN_regression_custom_loss_results_v6.csv)
 This is same as the previous neural network except that the loss function is defined as in the HSC paper. 
 
 - dataset: HSC_v6
