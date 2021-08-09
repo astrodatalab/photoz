@@ -127,7 +127,7 @@ mse: 0.083894
 ![image](https://user-images.githubusercontent.com/46472635/128579488-fdd896f3-598b-4591-bc72-6b12e32ea7b8.png)
 
 
-This is same as the previous neural network except that the loss function is defined as in the HSC paper. 
+This is same as the previous neural network except that the loss function is defined as in the HSC paper.\
 [results for XBGoost model](../results/NN_regression_custom_loss_results_v6.csv)
 
 - dataset: HSC_v6
