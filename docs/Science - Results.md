@@ -74,6 +74,22 @@ average loss: 0.147154
 ![image](https://user-images.githubusercontent.com/46472635/127443446-2525d095-3587-4425-98c8-0921b84aa7ad.png)
 ![image](https://user-images.githubusercontent.com/46472635/127443520-659ecdd5-b526-4ea8-a10c-0f7c0f4e7e50.png)
 
+
+- dataset: HSC_v6.csv
+
+- train test split: 0.2
+
+- metrics:\
+biweight bias:0.001776\
+conventional bias: 0.002788\
+biweight scatter: 0.048867\
+conventional scatter: 0.041609\
+biweighht outlier rate: 0.162619\
+conventional outlier rate: 0.111224\
+average loss: 0.14845\
+mse: 0.095405
+
+
 ### Neural Network
 
 [notebook for XGBoost model](../code/example_notebook_producing_nans.ipynb )
@@ -93,6 +109,8 @@ hidden4 = tf.keras.layers.Dense(400, activation="relu")(hidden3)\
 concat = tf.keras.layers.Concatenate()([input_, hidden4])\
 output = tf.keras.layers.Dense(1)(concat)\
 model = tf.keras.Model(inputs=[input_], outputs=[output])\
+model.compile(optimizer='adam', loss="mse",metrics=[tf.keras.metrics.MeanAbsoluteError()])\
+
 
 - metrics:\
 biweight bias:-0.002323\
@@ -107,4 +125,29 @@ mse: 0.083894
 ![image](https://user-images.githubusercontent.com/46472635/128579476-6161375d-63d1-4a6f-ab0a-f15c9dad2eba.png)
 ![image](https://user-images.githubusercontent.com/46472635/128579488-fdd896f3-598b-4591-bc72-6b12e32ea7b8.png)
 
+This is same as the previous neural network except that the loss function is defined as in the HSC paper. 
 
+- dataset: HSC_v6
+
+- train test split: 0.2
+
+- model: input_ = tf.keras.layers.Input(shape=x_train.shape[1:])\
+hidden1 = tf.keras.layers.Dense(400, activation="relu")(input_)\
+hidden2 = tf.keras.layers.Dense(400, activation="relu")(hidden1)\
+hidden3 = tf.keras.layers.Dense(400, activation="relu")(hidden2)\
+hidden4 = tf.keras.layers.Dense(400, activation="relu")(hidden3)\
+concat = tf.keras.layers.Concatenate()([input_, hidden4])\
+output = tf.keras.layers.Dense(1)(concat)\
+model = tf.keras.Model(inputs=[input_], outputs=[output])\
+model.compile(optimizer='adam', loss=custom_loss,metrics=[tf.keras.metrics.MeanAbsoluteError()])\
+
+
+- metrics:\
+biweight bias:-0.002836\
+conventional bias: -0.002908\
+biweight scatter: 0.030743\
+conventional scatter: 0.026149\
+biweighht outlier rate: 0.150347\
+conventional outlier rate: 0.065868\
+average loss: 0.096043\
+mse: 0.119405
