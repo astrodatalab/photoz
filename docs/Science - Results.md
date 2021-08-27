@@ -154,3 +154,29 @@ biweighht outlier rate: 0.150347\
 conventional outlier rate: 0.065868\
 average loss: 0.096043\
 mse: 0.119405
+
+- dataset: HSC_v6
+
+- train test split: 0.2
+
+input_ = tf.keras.layers.Input(shape=x_train.shape[1:])\
+hidden1 = tf.keras.layers.Dense(300, activation="selu")(input_)\
+hidden2 = tf.keras.layers.Dense(400, activation="relu")(hidden1)\
+hidden3 = tf.keras.layers.Dense(600, activation="relu")(hidden2)\
+hidden4 = tf.keras.layers.Dense(400, activation="selu")(hidden3)\
+output = tf.keras.layers.Dense(1)(hidden4)\
+model = tf.keras.Model(inputs=[input_], outputs=[output])\
+
+model.compile(optimizer='adam', loss="mse",metrics=[tf.keras.metrics.MeanAbsoluteError()])\
+
+model.fit(x_train,y_train,batch_size=8200,epochs=210,shuffle = True,verbose=0,validation_data=(x_test,y_test))\
+
+- metrics:\
+biweight bias: 	0.000375\
+conventional bias: 0.000984\
+biweight scatter: 0.041417\
+conventional scatter: 0.03477\
+biweighht outlier rate: 0.113301\
+conventional outlier rate: 0.095564\
+average loss: 0.129212\
+mse: 0.080236
