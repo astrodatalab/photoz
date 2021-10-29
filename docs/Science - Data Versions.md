@@ -33,3 +33,23 @@ Same filters as HSC_v5 with conditions on specz_i_mag:
 
 1. specz_i_mag > 0 # this is to get rid of negative values
 2. specz_i_mag < 28 # this matches the faintest i band magnitude from photometric measurements, which is about 27.9
+
+### HSC_v7
+
+Same filters as HSC_v6
+
+These images contain only those galaxies with images in all 5 bands that are 120x120 and have a central object within 5 pixels of the center in at least one band.
+
+### HSC_v8
+
+Same filters as HSC_v6
+
+The images contained here result from requiring that each galaxy must have at least ONE
+band image with a galaxy present within 5 pixels from the center, but no limit on the dimensions.
+
+### HSC_v9
+
+Same filters as HSC_v6
+
+These images contain only those galaxies with images in all 5 bands that are 120x120 and have a central object within 5 pixels of the center in every band.
+
