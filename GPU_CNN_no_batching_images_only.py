@@ -100,7 +100,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_best_only=True)
 
 
-history = model.fit(x = x_train,y = y_train,batch_size= 1, epochs=1, shuffle = True,verbose=1, callbacks = [cp_callback])
+history = model.fit(x = x_train,y = y_train, epochs=100, shuffle = True,verbose=1, callbacks = [cp_callback])
 
 
 #!mkdir -p saved_model
