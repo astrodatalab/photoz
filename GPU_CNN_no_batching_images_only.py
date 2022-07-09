@@ -31,8 +31,8 @@ hf = h5py.File('/home/boscoe/spell/five_band_image127x127_testing.hdf5', 'r')
 # import random
 # random_indices = random.sample(range(1, 100000), 5000)
 
-x = hf["image"][0:1000,:,:,:]
-y = hf["specz"][0:1000]
+x = hf["image"]
+y = hf["specz"]
 y_train = np.array(y)
 
 
@@ -78,7 +78,7 @@ conv1 = tf.keras.layers.Conv2D(32, kernel_size=(3, 3),activation='tanh')(input1_
 pooling1 = tf.keras.layers.MaxPooling2D(pool_size = (2,2))(conv1)
 conv4 = tf.keras.layers.Conv2D(32, kernel_size=(2,2),activation='relu')(pooling1)
 flatten = tf.keras.layers.Flatten()(conv4)
-dense1 = tf.keras.layers.Dense(5080, activation="tanh")(flatten)
+dense1 = tf.keras.layers.Dense(1016, activation="tanh")(flatten)
 dense2 = tf.keras.layers.Dense(508, activation="tanh")(dense1)
 output = tf.keras.layers.Dense(1)(dense2)
 model = tf.keras.Model(inputs=[input1_],outputs = [output])
