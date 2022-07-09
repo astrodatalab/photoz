@@ -26,7 +26,7 @@ import h5py
 #from keras.preprocessing.image import ImageDataGenerator
 
 
-hf = h5py.File('/home/boscoe/spell/five_band_image127x127_testing.hdf5', 'r')
+hf = h5py.File('/home/boscoe/spell/five_band_image127x127_training_full.hdf5', 'r')
 
 # import random
 # random_indices = random.sample(range(1, 100000), 5000)
