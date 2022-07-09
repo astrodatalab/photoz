@@ -45,7 +45,7 @@ x_train = np.true_divide(x,max_value)
 hf.close()
 
 
-hf = h5py.File('/home/boscoe/spell/five_band_image127x127_testing.hdf5', 'r')
+hf = h5py.File('../spell/five_band_image127x127_testing.hdf5', 'r')
 
 # import random
 # random_indices = random.sample(range(1, 100000), 5000)
