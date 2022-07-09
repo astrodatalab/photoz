@@ -76,17 +76,11 @@ input1_ = tf.keras.layers.Input(shape=(127,127,5))
 #CNN
 conv1 = tf.keras.layers.Conv2D(32, kernel_size=(3, 3),activation='tanh')(input1_)
 pooling1 = tf.keras.layers.MaxPooling2D(pool_size = (2,2))(conv1)
-conv2 = tf.keras.layers.Conv2D(32, kernel_size=(2,2),activation='tanh')(pooling1)
-pooling2 = tf.keras.layers.MaxPooling2D(pool_size = (2,2))(conv2)
-conv3 = tf.keras.layers.Conv2D(32, kernel_size=(3,3),activation='relu')(pooling2)
-conv4 = tf.keras.layers.Conv2D(32, kernel_size=(2,2),activation='relu')(conv3)
+conv4 = tf.keras.layers.Conv2D(32, kernel_size=(2,2),activation='relu')(pooling1)
 flatten = tf.keras.layers.Flatten()(conv4)
 dense1 = tf.keras.layers.Dense(5080, activation="tanh")(flatten)
 dense2 = tf.keras.layers.Dense(508, activation="tanh")(dense1)
-dense3 = tf.keras.layers.Dense(400,activation = "tanh")(dense2)
-
-output = tf.keras.layers.Dense(1)(dense3)
-
+output = tf.keras.layers.Dense(1)(dense2)
 model = tf.keras.Model(inputs=[input1_],outputs = [output])
 
 model.summary()
