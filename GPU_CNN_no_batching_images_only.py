@@ -26,7 +26,7 @@ import h5py
 #from keras.preprocessing.image import ImageDataGenerator
 
 
-hf = h5py.File('/home/boscoe/spell/five_band_image127x127_training_full.hdf5', 'r')
+hf = h5py.File('/home/boscoe/spell/five_band_image127x127_testing.hdf5', 'r')
 
 # import random
 # random_indices = random.sample(range(1, 100000), 5000)
@@ -45,23 +45,23 @@ x_train = np.true_divide(x,max_value)
 hf.close()
 
 
-hf = h5py.File('../spell/five_band_image127x127_testing.hdf5', 'r')
+# hf = h5py.File('../spell/five_band_image127x127_testing.hdf5', 'r')
 
-# import random
-# random_indices = random.sample(range(1, 100000), 5000)
+# # import random
+# # random_indices = random.sample(range(1, 100000), 5000)
 
-x = hf["image"]
-y = hf["specz"]
-y_test = np.array(y)
+# x = hf["image"]
+# y = hf["specz"]
+# y_test = np.array(y)
 
 
-x = np.transpose(x,(0,2,3,1))
+# x = np.transpose(x,(0,2,3,1))
 
-max_value = np.max(x)
-max_value
+# max_value = np.max(x)
+# max_value
 
-x_test = np.true_divide(x,max_value)
-hf.close()
+# x_test = np.true_divide(x,max_value)
+# hf.close()
 
 
 from sklearn.model_selection import train_test_split
