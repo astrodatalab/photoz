@@ -31,8 +31,8 @@ hf = h5py.File('/home/boscoe/spell/five_band_image127x127_training_full.hdf5', '
 # import random
 # random_indices = random.sample(range(1, 100000), 5000)
 
-x = hf["image"][0:200000,:,:,:]
-y = hf["specz"][0:200000]
+x = hf["image"][0:100000,:,:,:]
+y = hf["specz"][0:100000]
 y_train = np.array(y)
 
 
