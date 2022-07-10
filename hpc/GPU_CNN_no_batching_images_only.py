@@ -104,4 +104,4 @@ history = model.fit(x = x_train,y = y_train, epochs=100, shuffle = True,verbose=
 
 
 #!mkdir -p saved_model
-model.save('saved_model/my_model')
+model.save(/home/boscoe/photoz/hpc/saved_model/my_model)
