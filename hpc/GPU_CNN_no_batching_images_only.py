@@ -88,7 +88,7 @@ model.summary()
 
 model.compile(optimizer='Adam', loss="mse",metrics=[tf.keras.metrics.MeanAbsoluteError()])
 
-checkpoint_path = "training_1/cp.ckpt"
+checkpoint_path = "/home/boscoe/photoz/hpc/training_1/cp.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
 # Create a callback that saves the model's weights
@@ -104,4 +104,4 @@ history = model.fit(x = x_train,y = y_train, epochs=100, shuffle = True,verbose=
 
 
 #!mkdir -p saved_model
-model.save(/home/boscoe/photoz/hpc/saved_model/cnn_hpc_v1)
+model.save('/home/boscoe/photoz/hpc/saved_model/cnn_hpc_v1')
