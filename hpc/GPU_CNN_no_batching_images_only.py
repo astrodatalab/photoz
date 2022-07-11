@@ -31,8 +31,8 @@ hf = h5py.File('/home/boscoe/spell/five_band_image127x127_training_full.hdf5', '
 # import random
 # random_indices = random.sample(range(1, 100000), 5000)
 
-x = hf["image"][0:100000,:,:,:]
-y = hf["specz"][0:100000]
+x = hf["image"][0:50000,:,:,:]
+y = hf["specz"][0:50000]
 y_train = np.array(y)
 
 
@@ -76,12 +76,20 @@ input1_ = tf.keras.layers.Input(shape=(127,127,5))
 #CNN
 conv1 = tf.keras.layers.Conv2D(32, kernel_size=(3, 3),activation='tanh')(input1_)
 pooling1 = tf.keras.layers.MaxPooling2D(pool_size = (2,2))(conv1)
-conv4 = tf.keras.layers.Conv2D(32, kernel_size=(2,2),activation='relu')(pooling1)
+conv2 = tf.keras.layers.Conv2D(32, kernel_size=(2,2),activation='tanh')(pooling1)
+pooling2 = tf.keras.layers.MaxPooling2D(pool_size = (2,2))(conv2)
+conv3 = tf.keras.layers.Conv2D(32, kernel_size=(3,3),activation='relu')(pooling2)
+conv4 = tf.keras.layers.Conv2D(32, kernel_size=(2,2),activation='relu')(conv3)
 flatten = tf.keras.layers.Flatten()(conv4)
-dense1 = tf.keras.layers.Dense(1016, activation="tanh")(flatten)
+dense1 = tf.keras.layers.Dense(5080, activation="tanh")(flatten)
 dense2 = tf.keras.layers.Dense(508, activation="tanh")(dense1)
-output = tf.keras.layers.Dense(1)(dense2)
-model = tf.keras.Model(inputs=[input1_],outputs = [output])
+dense3 = tf.keras.layers.Dense(200,activation = "tanh")(dense2)
+
+output = tf.keras.layers.Dense(1)(concat)
+
+model = tf.keras.Model(inputs=[input1_,input2_],outputs = [output])
+
+
 
 model.summary()
 
@@ -100,7 +108,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_best_only=True)
 
 
-history = model.fit(x = x_train,y = y_train, epochs=100, shuffle = True,verbose=1, callbacks = [cp_callback])
+history = model.fit(x = x_train,y = y_train, epochs=300, batch_size=500, shuffle = True,verbose=1, callbacks = [cp_callback])
 
 
 #!mkdir -p saved_model
