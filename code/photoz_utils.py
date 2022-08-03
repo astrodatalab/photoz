@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-import datetime
+from datetime import datetime
 
 from sklearn.model_selection import train_test_split
 from astropy.stats import biweight_location, biweight_midvariance
@@ -518,7 +518,7 @@ def plot_density_metrics(metrics):
 ###############
 
 
-def save_with_oid_std(name, oid_test, y_test_spectro, y_test_prediction, y_test_std)
+def save_with_oid_std(name, oid_test, y_test_spectro, y_test_prediction, y_test_std):
     """
     Saves predictions providing object id labels. 
     """
@@ -526,13 +526,13 @@ def save_with_oid_std(name, oid_test, y_test_spectro, y_test_prediction, y_test_
     now = datetime.now()
     t_string = now.strftime("%Y_%m_%d_%H:%M:%S")
     m_string = now.strftime("%Y_%m")
-    if os.path.exists("/predictions"+m_string+'/'+name)==False:
-        os.makedirs("/predictions"+m_string+'/'+name)
+    if os.path.exists("/predictions/"+m_string+'/'+name)==False:
+        os.makedirs("/predictions/"+m_string+'/'+name)
     df = pd.DataFrame(predictions, columns=['object_id', 'specz', 'photoz', 'photoz_err'])
     df.to_csv('/predictions/'+m_string+'/'+name+'/'+t_string+'.csv')
     
 
-def save_with_oid(name, oid_test, y_test_spectro, y_test_prediction)
+def save_with_oid(name, oid_test, y_test_spectro, y_test_prediction):
     """
     Saves predictions providing object id labels. 
     """
@@ -541,8 +541,8 @@ def save_with_oid(name, oid_test, y_test_spectro, y_test_prediction)
     now = datetime.now()
     t_string = now.strftime("%Y_%m_%d_%H:%M:%S")
     m_string = now.strftime("%Y_%m")
-    if os.path.exists("/predictions"+m_string+'/'+name)==False:
-        os.makedirs("/predictions"+m_string+'/'+name)
+    if os.path.exists("/predictions/"+m_string+'/'+name)==False:
+        os.makedirs("/predictions/"+m_string+'/'+name)
     df = pd.DataFrame(predictions, columns=['object_id', 'specz', 'photoz', 'photoz_err'])
     df.to_csv('/predictions/'+m_string+'/'+name+'/'+t_string+'.csv')
 
