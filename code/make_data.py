@@ -269,5 +269,5 @@ def make_hdf5_from_raw_images():
       image_z.close()
       image_y.close()
 
-hf.close()
+  hf.close()
 
