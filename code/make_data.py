@@ -169,3 +169,105 @@ def make_hsc_v6_small_hdf(ntrain=10000,ntest=2000,nvalidation=2000):
             dset.write_direct(tmp[inds])
         f.close()
         hf.close()
+
+        
+def make_hdf5_from_raw_images():
+  #WORKING TO PRODUCE FINAL FULL DATASET:
+
+  #for raw:
+
+  #get number of galaxies in the image directory and sort them
+
+  image_list_g = sorted(os.listdir("../../data/HSC/HSC_v6/step1/g_band"))
+
+  # image_list_r = sorted(os.listdir("../../data/HSC/HSC_v6/step1/r_band"))
+  # image_list_i = sorted(os.listdir("../../data/HSC/HSC_v6/step1/i_band"))
+  # image_list_z = sorted(os.listdir("../../data/HSC/HSC_v6/step1/z_band"))
+  # image_list_y = sorted(os.listdir("../../data/HSC/HSC_v6/step1/y_band"))
+
+  #load metadata
+  photozdata = pd.read_csv('/mnt/data/HSC/HSC_v6/HSC_v6.csv')
+  photozdata.describe()
+
+  b = np.argsort(photozdata['object_id'])
+  sorted_photozdata = photozdata.iloc[b][:]
+  photozdata = sorted_photozdata
+
+  #name the file you want to create
+  hf= h5py.File('../../data/HSC/HSC_v6/five_band_image127x127_with_metadata_corrected_2.hdf5', 'a')
+
+
+  for (columnName, columnData) in photozdata.iteritems():
+      print(columnName)
+      #there was an issue saving hdf5 columns with np Object data type so re-assign the problem columns to str:
+      if columnName == 'specz_name' or columnName == 'coord':
+              a = np.array(photozdata[columnName]).astype(str)
+              #b = np.reshape(a,[286401,1])
+              b = np.reshape(a,[286401,1])
+              hf.create_dataset(columnName,data=b.astype('S'))
+
+              continue
+      hf.create_dataset(columnName,data=photozdata[columnName])
+
+
+  for i in range(len(image_list_g)):
+  #for i in range(10):
+
+      object_id = image_list_g[i][0:17]
+
+      five_band_image = []
+
+      image_g = fits.open("../../data/HSC/HSC_v6/step1/g_band/"+image_list_g[i])
+      image_r = fits.open("../../data/HSC/HSC_v6/step1/r_band/"+image_list_r[i])
+      image_i = fits.open("../../data/HSC/HSC_v6/step1/i_band/"+image_list_i[i])
+      image_z = fits.open("../../data/HSC/HSC_v6/step1/z_band/"+image_list_z[i])
+      image_y = fits.open("../../data/HSC/HSC_v6/step1/y_band/"+image_list_y[i])
+
+      image_g_data = image_g[1].data
+      image_r_data = image_r[1].data
+      image_i_data = image_i[1].data
+      image_z_data = image_z[1].data
+      image_y_data = image_y[1].data
+
+      pad1 = int((127-len(image_g_data))/2)
+      pad2 = 127-len(image_g_data)-pad1
+      pad3 = int((127-len(image_g_data[0]))/2)
+      pad4 = 127-len(image_g_data[0])-pad3
+
+
+      im_g = np.pad(image_g_data,((pad1,pad2),(pad3,pad4)),"constant",constant_values = ((0,0),(0,0)))
+      im_r = np.pad(image_r_data,((pad1,pad2),(pad3,pad4)),"constant",constant_values = ((0,0),(0,0)))
+      im_i = np.pad(image_i_data,((pad1,pad2),(pad3,pad4)),"constant",constant_values = ((0,0),(0,0)))
+      im_z = np.pad(image_z_data,((pad1,pad2),(pad3,pad4)),"constant",constant_values = ((0,0),(0,0)))
+      im_y = np.pad(image_y_data,((pad1,pad2),(pad3,pad4)),"constant",constant_values = ((0,0),(0,0)))
+
+      five_band_image.append(im_g)
+      five_band_image.append(im_r)
+      five_band_image.append(im_i)
+      five_band_image.append(im_z)
+      five_band_image.append(im_y)
+
+      five_band_image_reshape = np.reshape(np.array(five_band_image),[1,5,127,127])
+
+      photozdata_subset = photozdata.iloc[i]
+
+      specz = photozdata_subset["specz_redshift"]
+      specz_reshape = np.reshape(specz,[1,1])
+
+      if i == 0:
+          hf.create_dataset("image",data = five_band_image_reshape,chunks = True,maxshape = (None,5,127,127))
+
+      else:
+          hf['image'].resize((hf['image'].shape[0]+1), axis=0)
+          hf['image'][hf["image"].shape[0]-1,:,:,:] = five_band_image
+
+
+
+      image_g.close()
+      image_r.close()
+      image_i.close()
+      image_z.close()
+      image_y.close()
+
+hf.close()
+
