@@ -576,11 +576,10 @@ def save_train_with_oid(name, object_id, specz, photoz):
     df.to_csv('/predictions/'+name+'/'+m_string+'/'+t_string+'_training.csv')
 
     
-def save_validation_with_oid(name, object_id, specz, photoz):
+def save_validation_with_oid_std(name, object_id, specz, photoz, photoz_err):
     """
     Saves predictions on training set providing object id labels. 
     """
-    photoz_err = [nan] * len(object_id)
     predictions = np.transpose(np.vstack((object_id, specz, photoz, photoz_err)))
     now = datetime.now()
     t_string = now.strftime('%Y_%m_%d_%H:%M:%S')
