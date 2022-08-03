@@ -285,24 +285,22 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
     ntrain = sample_sizes[0]
     ntest = sample_sizes[1]
     nvalidation = sample_sizes[2]
-    print(current_file,'nsamples',nsample)
-    hf = h5py.File(current_file,'r')
+    hf = h5py.File('/mnt/data/HSC/HSC_v6/step2A/127x127/five_band_image127x127_with_metadata_corrected.hdf5','r')
         
     inds = random.sample(list(np.arange(len(hf['object_id']))),sample_sizes[0]+sample_sizes[1]+sample_sizes[2])
-    inds_train = inds[:ntrain]
-    inds_test = inds[ntrain:ntrain+ntest]
-    inds_validation = inds[ntrain+ntest:]
+    inds_train = np.sort(inds[:ntrain])
+    inds_test = np.sort(inds[ntrain:ntrain+ntest])
+    inds_validation = np.sort(inds[ntrain+ntest:])
 
     part = os.path.splitext(current_file)
-    outfile_train = part[0]+'training_small.hdf5'
-    outfile_test = part[0]+'testing_small.hdf5'
-    outfile_validation = part[0]+'validation_small.hdf5'
+    outfile_train = part[0]+'_training_small.hdf5'
+    outfile_test = part[0]+'_testing_small.hdf5'
+    outfile_validation = part[0]+'_validation_small.hdf5'
         
 
     f_train = h5py.File(outfile_train,'w')
     f_test = h5py.File(outfile_test,'w')
     f_validation = h5py.File(outfile_validation,'w')
-    print('output',outfile)
     for k in hf.keys():
 
         tmp = hf[k]
@@ -318,5 +316,7 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
         trainset.write_direct(tmp[inds_train])
         testset.write_direct(tmp[inds_test])
         validationset.write_direct(tmp[inds_validation])
-    f.close()
+    f_train.close()
+    f_test.close()
+    f_validation.close()
     hf.close()
