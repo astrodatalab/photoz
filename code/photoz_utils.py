@@ -518,31 +518,90 @@ def plot_density_metrics(metrics):
 ###############
 
 
-def save_with_oid_std(name, oid_test, y_test_spectro, y_test_prediction, y_test_std):
+def save_with_oid_std(name, object_id, specz, photoz, photoz_err):
     """
     Saves predictions providing object id labels. 
     """
-    predictions = np.transpose(np.vstack((oid_test, y_test_spectro, y_test_prediction, y_test_std)))
+    predictions = np.transpose(np.vstack((object_id, specz, photoz, photoz_err)))
     now = datetime.now()
-    t_string = now.strftime("%Y_%m_%d_%H:%M:%S")
-    m_string = now.strftime("%Y_%m")
-    if os.path.exists("/predictions/"+m_string+'/'+name)==False:
-        os.makedirs("/predictions/"+m_string+'/'+name)
+    t_string = now.strftime('%Y_%m_%d_%H:%M:%S')
+    m_string = now.strftime('%Y_%m')
+    if os.path.exists('/predictions/'+name+'/'+m_string)==False:
+        os.makedirs('/predictions/'+name+'/'+m_string)
     df = pd.DataFrame(predictions, columns=['object_id', 'specz', 'photoz', 'photoz_err'])
-    df.to_csv('/predictions/'+m_string+'/'+name+'/'+t_string+'.csv')
+    df.to_csv('/predictions/'+name+'/'+m_string+'/'+t_string+'_testing.csv')
     
 
-def save_with_oid(name, oid_test, y_test_spectro, y_test_prediction):
+def save_with_oid(name, object_id, specz, photoz):
     """
-    Saves predictions providing object id labels. 
+    Saves predictions providing object id labels, for non variational models. 
     """
-    y_test_std = [nan] * len(oid_test)
-    predictions = np.transpose(np.vstack((oid_test, y_test_spectro, y_test_prediction, y_test_std)))
+    photoz_err = [nan] * len(object_id)
+    predictions = np.transpose(np.vstack((object_id, specz, photoz, photoz_err)))
     now = datetime.now()
-    t_string = now.strftime("%Y_%m_%d_%H:%M:%S")
-    m_string = now.strftime("%Y_%m")
-    if os.path.exists("/predictions/"+m_string+'/'+name)==False:
-        os.makedirs("/predictions/"+m_string+'/'+name)
+    t_string = now.strftime('%Y_%m_%d_%H:%M:%S')
+    m_string = now.strftime('%Y_%m')
+    if os.path.exists('/predictions/'+name+'/'+m_string)==False:
+        os.makedirs('/predictions/'+name+'/'+m_string)
     df = pd.DataFrame(predictions, columns=['object_id', 'specz', 'photoz', 'photoz_err'])
-    df.to_csv('/predictions/'+m_string+'/'+name+'/'+t_string+'.csv')
+    df.to_csv('/predictions/'+name+'/'+m_string+'/'+t_string+'_testing.csv')
+
+    
+def save_train_with_oid_std(name, object_id, specz, photoz, photoz_err):
+    """
+    Saves predictions on training set providing object id labels. 
+    """
+    predictions = np.transpose(np.vstack((object_id, specz, photoz, photoz_err)))
+    now = datetime.now()
+    t_string = now.strftime('%Y_%m_%d_%H:%M:%S')
+    m_string = now.strftime('%Y_%m')
+    if os.path.exists('/predictions/'+name+'/'+m_string)==False:
+        os.makedirs('/predictions/'+name+'/'+m_string)
+    df = pd.DataFrame(predictions, columns=['object_id', 'specz', 'photoz', 'photoz_err'])
+    df.to_csv('/predictions/'+name+'/'+m_string+'/'+t_string+'_training.csv')
+
+    
+def save_train_with_oid(name, object_id, specz, photoz):
+    """
+    Saves predictions on training set providing object id labels. 
+    """
+    photoz_err = [nan] * len(object_id)
+    predictions = np.transpose(np.vstack((object_id, specz, photoz, photoz_err)))
+    now = datetime.now()
+    t_string = now.strftime('%Y_%m_%d_%H:%M:%S')
+    m_string = now.strftime('%Y_%m')
+    if os.path.exists('/predictions/'+name+'/'+m_string)==False:
+        os.makedirs('/predictions/'+name+'/'+m_string)
+    df = pd.DataFrame(predictions, columns=['object_id', 'specz', 'photoz', 'photoz_err'])
+    df.to_csv('/predictions/'+name+'/'+m_string+'/'+t_string+'_training.csv')
+
+    
+def save_validation_with_oid(name, object_id, specz, photoz):
+    """
+    Saves predictions on training set providing object id labels. 
+    """
+    photoz_err = [nan] * len(object_id)
+    predictions = np.transpose(np.vstack((object_id, specz, photoz, photoz_err)))
+    now = datetime.now()
+    t_string = now.strftime('%Y_%m_%d_%H:%M:%S')
+    m_string = now.strftime('%Y_%m')
+    if os.path.exists('/predictions/'+name+'/'+m_string)==False:
+        os.makedirs('/predictions/'+name+'/'+m_string)
+    df = pd.DataFrame(predictions, columns=['object_id', 'specz', 'photoz', 'photoz_err'])
+    df.to_csv('/predictions/'+name+'/'+m_string+'/'+t_string+'_validation.csv')
+
+    
+def save_validation_with_oid(name, object_id, specz, photoz):
+    """
+    Saves predictions on training set providing object id labels. 
+    """
+    photoz_err = [nan] * len(object_id)
+    predictions = np.transpose(np.vstack((object_id, specz, photoz, photoz_err)))
+    now = datetime.now()
+    t_string = now.strftime('%Y_%m_%d_%H:%M:%S')
+    m_string = now.strftime('%Y_%m')
+    if os.path.exists('/predictions/'+name+'/'+m_string)==False:
+        os.makedirs('/predictions/'+name+'/'+m_string)
+    df = pd.DataFrame(predictions, columns=['object_id', 'specz', 'photoz', 'photoz_err'])
+    df.to_csv('/predictions/'+name+'/'+m_string+'/'+t_string+'_validation.csv')
 
