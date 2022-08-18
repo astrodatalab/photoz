@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from datetime import datetime
+from tabulate import tabulate
 
 from sklearn.model_selection import train_test_split
 from astropy.stats import biweight_location, biweight_midvariance
@@ -313,6 +314,19 @@ def calculate_loss(z_photo, z_spec):
     return L
 
 
+def calculate_percentage_change(i, j):
+    """
+    Returns percent increase in some value with respect to j when applying i.
+        i: float
+        j: float
+    """
+    if i / j == 1:
+        return f'{0}%'
+    else:
+        return '{:.2f}'.format(100 * ((i - j) / j)) + ' %' # 2 decimal precision
+        # measures percent increase
+        
+        
 ############################
 # DENSITY ESTIMATE METRICS #
 ############################
@@ -513,6 +527,123 @@ def plot_density_metrics(metrics):
     plt.yscale('log')
 
     
+def compare_point_metrics_scatter(metrics_array, legends, desc, markers, zmax=4, marker_size=130):
+    """
+    Pass in a list where the elements are the output of binned get_point_metrics() from photoz_utils.py and compare some of the metrics on each plot.
+        metrics_array: list
+            A list of metric DataFrames acquired from binned get_point_metrics() output.
+        legends: list
+            Legend labels for the models in the metrics_array as strings.
+        desc: str
+            Plot title.
+        markers: list
+            A list of strings where you indicate the markers for models in metrics_array.
+        zmax: float
+            Maximum redshift to be displayed.
+        marker_size: int
+            Size of the markers displayed.
+    """
+    index = len(metrics_array)
+    sns.set(rc={'figure.figsize':(16,24), 'lines.markersize':10})
+    plt.suptitle(f'{desc}')
+    plt.subplots_adjust(hspace=0.3)
+    metrics = ['bias_conv', 'scatter_conv', 'outlier_conv', 'loss', 'mse']
+    for i in enumerate(metrics):
+        plt.subplot(len(metrics), 1, i[0] + 1)
+        for j in range(0,index):
+            
+            sns.lineplot(x=[0, zmax], y=[0, 0], linewidth=2, color='black')
+            bin_lefts = metrics_array[j]['zspec_bin'].apply(lambda x: x.left)
+            sns.scatterplot(
+                x=bin_lefts, 
+                y=metrics_array[j][i[1]], 
+                marker = markers[j], 
+                edgecolor='none', 
+                label=f'{legends[j]}', 
+                s=marker_size)
+            
+            plt.xlabel('Redshift', fontsize=18)
+            plt.ylabel(f'{metrics[i[0]]}', fontsize=18)
+            plt.xticks(fontsize=16)
+            plt.yticks(fontsize=16)
+            plt.legend(fontsize=16)
+            
+            
+def compare_point_metrics_table(metrics_array1, metrics_array2, caption):
+    """
+    Pass in the output of get_point_metrics() from photoz_utils.py and get a table comparing the percent increase that metrics_array1
+    had compared to metrics_array2 for each metric for a given bin. Has issues displays more than a few bins. Does not display biweight
+    metrics.
+        metrics_array1: DataFrame
+            Binned metrics DataFrame acquired from get_point_metrics().
+        metrics_array2: DataFrame
+            Binned metrics DataFrame acquired from get_point_metrics().
+        caption: str
+            Describe what metrics are being displayed.
+    """
+    metrics = ['bias_conv', 'scatter_conv', 'outlier_conv', 'loss', 'mse']
+    percs = []
+    title = ['Metric']
+    zspec_ranges = list(metrics_array1.loc[:,'zspec_bin'].apply(lambda x: f'z: {x.left} - {x.right}'))
+    heading = title + zspec_ranges
+    percs.append(heading)
+    
+    for i in enumerate(metrics):
+        array1_metric = np.asarray(metrics_array1.loc[:, i[1]])
+        array2_metric = np.asarray(metrics_array2.loc[:, i[1]])
+        perc = [calculate_percentage_change(i, j) for i, j in zip(array1_metric, array2_metric)]
+        perc = [i[1] + ' percent change'] + perc # add metric name
+        percs.append(perc)
+    print(caption, '\n')
+    print(tabulate(percs, headers='firstrow', tablefmt='fancy_grid'))
+    
+    
+def compare_point_metrics_bar(model_arr, model_names, fig_size=(10,5), conventional_only=True, palette='colorblind'):
+    """
+    list: model_arr
+        List of the Pandas DataFrames which are the output of unbinned get_point_metrics().
+    list: models_names
+        List of strings which represent the models in the model_arr in order.
+    fig_size: tuple
+        Size of the barplots.
+    conventional_only: bool
+        Determines which metrics are displayed. If conventional, none of the biweight metrics are shown.
+    palette: str
+        Determines the color palette of the barplots.
+        
+    """
+    if conventional_only:
+        metrics = [model_arr[0].columns[i] for i in [2,4,6,8,9]] # List of conv metrics names
+    else:
+        metrics = list(model_arr[0].columns[2:10]) # List of metrics names
+        
+    bar_colors = sns.color_palette(palette=palette, n_colors=len(model_arr)) 
+     
+    model_metrics_list = []
+    
+    for metric in metrics:
+        model_metrics = []
+        
+        for i in range(0, len(model_arr)):
+            model_metrics.append(model_arr[i].loc[0][metric]) # Add each model's value for a certain metric its own list.
+            
+        model_metrics_dict = dict(zip(model_names, model_metrics)) # Add model names to the corresponding models.
+        model_metrics_list.append(model_metrics_dict) # Add model metric values for all metrics
+    # print(model_metrics_list)
+    
+    for i in range(0, len(model_metrics_list)):
+        
+        idx = list(model_metrics_list[i].keys())
+        vals = np.abs(list(model_metrics_list[i].values()))
+        fig = plt.figure(figsize=fig_size)
+        ax = plt.bar(idx, vals, width=0.4, color=bar_colors)
+        plt.xlabel(f'Model', fontsize=18)
+        plt.ylabel(f'{metrics[i]}', fontsize=18)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        plt.legend(iter(ax), model_names, fontsize=16) # must iterate over the bars for the legend to work
+        
+        
 ###############
 # DATA SAVING #
 ###############
