@@ -320,3 +320,34 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
     f_test.close()
     f_validation.close()
     hf.close()
+
+    
+def make_hsc_v6_large(ntrain=200481,ntest=42960,nvalidation=42960):
+    inputfile = 'five_band_image127x127_with_metadata_corrected.hdf5'
+    directory = '/data/HSC/HSC_v6/step2A/127x127/'
+    current_file = os.path.join(directory, inputfile)
+    hf = h5py.File(current_file,'r')
+    
+    length = len(hf['object_id'])
+    inds = random.sample(list(np.arange(length)),ntrain+ntest+nvalidation)
+    inds_train = np.sort(inds[:ntrain])
+    inds_test = np.sort(inds[ntrain:ntrain+ntest])
+    inds_validation = np.sort(inds[ntrain+ntest:])
+
+    part = os.path.splitext(current_file)
+    subsizes = [ntrain, ntest, nvalidation]
+    file_ends = ['_training', '_testing', '_validation']
+    ind_list = [inds_train, inds_test, inds_validation]
+    
+    for subsize, file_end, ind in zip(subsizes, file_ends, ind_list):
+        f = h5py.File(part[0] + file_end + part[1], 'w')
+        for k in hf.keys():
+            tmp = hf[k]
+            subshape = list(np.shape(tmp))
+            subshape[0] = subsize
+            dataset = f.create_dataset(k,shape=subshape,dtype=tmp.dtype)
+            for i, index in enumerate(ind):
+                dataset[i] = tmp[index]
+            tmp = None
+        f.close()
+    hf.close()
