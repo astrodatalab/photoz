@@ -305,7 +305,7 @@ class HDF5ImageGenerator(Sequence):
         np.ndarray
             A batch of normalized image tensors.
         """
-        return batch_X.astype("float32") / 255.0
+        return batch_X.astype("float32") / 4.16
 
     def __next_batch_test(self, indices: np.ndarray) -> np.ndarray:
         """Generates a batch of test data for the given indices.
