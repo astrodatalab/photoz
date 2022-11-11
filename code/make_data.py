@@ -176,8 +176,49 @@ def make_hsc_v6_small_subset_hdf(ntrain=10000,ntest=2000,nvalidation=2000,cap=0.
             dset.write_direct(tmp[inds])
         f.close()
         hf.close()
-
         
+        
+def make_hsc_v6_subset_hdf(ntrain=10000,ntest=2000,nvalidation=2000,cap=0.1):
+    '''
+    Create a smaller images dataset for easier training and testing, with maximum z=cap. 
+
+
+    '''
+    sample_sizes = [ntrain,ntest,nvalidation]
+
+    inputfiles = ['five_band_image127x127_with_metadata_corrected_training.hdf5','five_band_image127x127_with_metadata_corrected_testing.hdf5','five_band_image127x127_with_metadata_corrected_validation.hdf5']
+    directory = '/mnt/data/HSC/HSC_v6/step2A/127x127/'
+    for i in range(len(sample_sizes)):
+        current_file = os.path.join(directory,inputfiles[i])
+        nsample = sample_sizes[i]
+        print(current_file,'nsamples',nsample)
+        hf = h5py.File(current_file,'r')
+        y_train = np.asarray(hf['specz_redshift'][0:])[..., None]
+        inds = np.array([])
+        for j in range(len(y_train)):
+            if(y_train[j] <= 0.1):
+                inds = np.append(inds, j)
+        inds = inds.astype(int)
+        inds = np.sort(inds)
+        print(inds)
+        part = os.path.splitext(current_file)
+        outfile = part[0]+'_0.1.hdf5'
+        
+
+        f = h5py.File(outfile,'w')
+        print('output',outfile)
+        for k in hf.keys():
+
+            tmp = hf[k]
+            s = list(np.shape(tmp))
+            s[0] = len(inds)
+            print(k,nsample,tmp.dtype)            
+            dset = f.create_dataset(k,shape=s,dtype=tmp.dtype)
+            dset.write_direct(tmp[inds])
+        f.close()
+        hf.close()
+
+
 def make_hsc_v6_small_hdf(ntrain=10000,ntest=2000,nvalidation=2000):
     '''
     Create a smaller images dataset for easier training and testing. 
