@@ -406,9 +406,9 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
     hf.close()
 
     
-def make_hsc_v6_large(ntrain=200481,ntest=42960,nvalidation=42960):
-    inputfile = 'five_band_image127x127_with_metadata_corrected.hdf5'
-    directory = '/data/HSC/HSC_v6/step2A/127x127/'
+def make_hsc_v6_large(ntrain=187930,ntest=37586,nvalidation=37586):
+    inputfile = '127x127.hdf5'
+    directory = '/mnt/data/HSC/HSC_v6/step3/'
     current_file = os.path.join(directory, inputfile)
     hf = h5py.File(current_file,'r')
     
