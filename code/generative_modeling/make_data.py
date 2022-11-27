@@ -227,8 +227,8 @@ def make_hsc_v6_small_hdf(ntrain=10000,ntest=2000,nvalidation=2000):
     '''
     sample_sizes = [ntrain,ntest,nvalidation]
 
-    inputfiles = ['five_band_image127x127_training_with_metadata.hdf5','five_band_image127x127_testing_with_metadata.hdf5','five_band_image127x127_validation_with_metadata.hdf5']
-    directory = '/data/HSC/HSC_v6/step2A/127x127/'
+    inputfiles = ['127x127_in_training.hdf5','127x127_in_testing.hdf5','127x127_in_validation.hdf5']
+    directory = '/data/HSC/HSC_v6/step3/'
     for i in range(len(sample_sizes)):
         current_file = os.path.join(directory,inputfiles[i])
         nsample = sample_sizes[i]
@@ -406,8 +406,8 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
     hf.close()
 
     
-def make_hsc_v6_large(ntrain=187930,ntest=37586,nvalidation=37586):
-    inputfile = '127x127.hdf5'
+def make_hsc_v6_large(ntrain=187707,ntest=37541,nvalidation=37541):
+    inputfile = '127x127_in.hdf5'
     directory = '/mnt/data/HSC/HSC_v6/step3/'
     current_file = os.path.join(directory, inputfile)
     hf = h5py.File(current_file,'r')
