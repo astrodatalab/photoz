@@ -227,7 +227,7 @@ def make_hsc_v6_small_hdf(ntrain=10000,ntest=2000,nvalidation=2000):
     '''
     sample_sizes = [ntrain,ntest,nvalidation]
 
-    inputfiles = ['127x127_in_training.hdf5','127x127_in_testing.hdf5','127x127_in_validation.hdf5']
+    inputfiles = ['127x127_mae_in_training.hdf5','127x127_mae_in_testing.hdf5','127x127_mae_in_validation.hdf5']
     directory = '/data/HSC/HSC_v6/step3/'
     for i in range(len(sample_sizes)):
         current_file = os.path.join(directory,inputfiles[i])
@@ -363,13 +363,13 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
     '''
     sample_sizes = [ntrain,ntest,nvalidation]
 
-    inputfiles = ['five_band_image127x127_with_metadata_corrected.hdf5']
-    directory = '/data/HSC/HSC_v6/step2A/127x127/'
+    inputfiles = ['127x127_mae_out.hdf5']
+    directory = '/data/HSC/HSC_v6/step3/'
     current_file = os.path.join(directory,inputfiles[0])
     ntrain = sample_sizes[0]
     ntest = sample_sizes[1]
     nvalidation = sample_sizes[2]
-    hf = h5py.File('/mnt/data/HSC/HSC_v6/step2A/127x127/five_band_image127x127_with_metadata_corrected.hdf5','r')
+    hf = h5py.File('/mnt/data/HSC/HSC_v6/step3/127x127_mae_out.hdf5','r')
         
     inds = random.sample(list(np.arange(len(hf['object_id']))),sample_sizes[0]+sample_sizes[1]+sample_sizes[2])
     inds_train = np.sort(inds[:ntrain])
@@ -406,8 +406,8 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
     hf.close()
 
     
-def make_hsc_v6_large(ntrain=187707,ntest=37541,nvalidation=37541):
-    inputfile = '127x127_in.hdf5'
+def make_hsc_v6_large(ntrain=183153,ntest=36630,nvalidation=36630):
+    inputfile = '127x127_mae_in.hdf5'
     directory = '/mnt/data/HSC/HSC_v6/step3/'
     current_file = os.path.join(directory, inputfile)
     hf = h5py.File(current_file,'r')
