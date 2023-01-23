@@ -99,8 +99,8 @@ class HDF5ImageGenerator(Sequence):
         y_key="labels",
         classes_key=None,
         batch_size=32,
-        shuffle=True,
-        scaler=True,
+        shuffle=False,
+        scaler=False,
         num_classes=None,
         labels_encoding="hot",
         smooth_factor=0.1,
@@ -194,7 +194,7 @@ class HDF5ImageGenerator(Sequence):
             if dataset is not None:
                 return file[dataset][indices]
             else:
-                return (file[self.X_key][indices], file[self.y_key][indices])
+                return ([file[self.X_key][indices], file[self.y_key][indices]], file[self.X_key][indices])
     
     @property
     def num_items(self) -> int:
