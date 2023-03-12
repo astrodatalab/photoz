@@ -2,6 +2,7 @@
 *.pb   
  *.ckpt*
  *.index
+*.neptune*
 
 # Compiled files
 *.py[cod]
