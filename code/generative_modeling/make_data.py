@@ -5,6 +5,37 @@ import photoz_utils
 import random
 import h5py
 
+# modified by Billy
+
+def make_hsc_v6_large_z(cap = 1):
+    '''
+    Create image dataset for easier training, with minimum z = cap. - Billy 
+
+
+    '''
+    current_file = '/mnt/data/HSC/HSC_v6/step2A/127x127/5x127x127_training.hdf5'
+    hf = h5py.File(current_file, 'r')
+    y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
+    inds = np.array([])
+    for j in range(len(y_train)):
+        if(y_train[j] >= cap):
+            inds = np.append(inds, j)
+    inds = inds.astype(int)
+    inds = np.sort(inds)
+    outfile = f'/mnt/data/HSC/HSC_v6/step3/5x127x127_training_min_{cap}.hdf5'
+        
+
+    f = h5py.File(outfile, 'a')
+    print('output', outfile)
+    for k in hf.keys():
+
+        tmp = hf[k]
+        s = list(np.shape(tmp))
+        s[0] = len(inds)          
+        dset = f.create_dataset(k, shape = s, dtype = tmp.dtype)
+        dset.write_direct(tmp[inds])
+    f.close()
+    hf.close()
 
 def make_hsc_v5(inputfile='/mnt/data/HSC/HSC_v3/all_specz_flag_forced_forced2_spec_z_matched_online.csv',
                 outputfile='/mnt/data/HSC/HSC_v5/HSC_v5.csv'):
@@ -406,7 +437,7 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
     hf.close()
 
     
-def make_hsc_v6_large(ntrain=183153,ntest=36630,nvalidation=36630):
+def make_hsc_v6_large(ntrain=183192,ntest=36638,nvalidation=36638):
     inputfile = '127x127_mae_in.hdf5'
     directory = '/mnt/data/HSC/HSC_v6/step3/'
     current_file = os.path.join(directory, inputfile)
