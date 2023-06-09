@@ -35,3 +35,12 @@ Reads catalog and segmented image files created by Source Extractor and saves th
 Re-run the notebook for individual bands as to not try to read everything at once.
 Output files found in:
 /data/HSC/HSC_v6/step1/{band}_band_sextractor/shape_parameters.csv
+
+How to use HDF5DataGenerator.ipynb
+Describes how to use batching for images with the new data generator.
+
+shape_parameter_metrics_plots.ipynb & shape_parameter_plots_all_ bands.ipynb
+Contain plots used to analyze the impact of shape parameters in modle performance.
+
+partial_correlation_analysis.ipynb
+Analyzing the partial and mutual correlations between shape parameters and metrics. Table with some of the results in https://docs.google.com/document/d/1lsrSL0EyliGIe-ka9Ai4G1TCQVNfKinX91eFACllnqs/edit
