@@ -13,7 +13,7 @@ def make_hsc_v6_small_z(cap = 1):
 
 
     '''
-    current_file = '/data/HSC/HSC_v6/step2A/127x127/5x127x127_training.hdf5'
+    current_file = '/data/HSC/HSC_v6/step3A/64x64_validation.hdf5'
     hf = h5py.File(current_file, 'r')
     y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
     inds = np.array([])
@@ -22,37 +22,7 @@ def make_hsc_v6_small_z(cap = 1):
             inds = np.append(inds, j)
     inds = inds.astype(int)
     inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3/5x127x127_training_max_{cap}.hdf5'
-        
-
-    f = h5py.File(outfile, 'a')
-    print('output', outfile)
-    for k in hf.keys():
-
-        tmp = hf[k]
-        s = list(np.shape(tmp))
-        s[0] = len(inds)          
-        dset = f.create_dataset(k, shape = s, dtype = tmp.dtype)
-        dset.write_direct(tmp[inds])
-    f.close()
-    hf.close()
-    
-def make_hsc_v6_small_z_testing(cap = 1):
-    '''
-    Create image dataset for easier training, with minimum z = cap. - Billy 
-
-
-    '''
-    current_file = '/data/HSC/HSC_v6/step2A/127x127/5x127x127_testing.hdf5'
-    hf = h5py.File(current_file, 'r')
-    y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
-    inds = np.array([])
-    for j in range(len(y_train)):
-        if(y_train[j] <= cap):
-            inds = np.append(inds, j)
-    inds = inds.astype(int)
-    inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3/5x127x127_testing_max_{cap}.hdf5'
+    outfile = f'/data/HSC/HSC_v6/step3A/64x64_validation_z_less_than_{cap}.hdf5'
         
 
     f = h5py.File(outfile, 'a')
@@ -73,7 +43,7 @@ def make_hsc_v6_large_z(cap = 1):
 
 
     '''
-    current_file = '/data/HSC/HSC_v6/step2A/127x127/5x127x127_training.hdf5'
+    current_file = '/data/HSC/HSC_v6/step3A/64x64_validation.hdf5'
     hf = h5py.File(current_file, 'r')
     y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
     inds = np.array([])
@@ -82,67 +52,7 @@ def make_hsc_v6_large_z(cap = 1):
             inds = np.append(inds, j)
     inds = inds.astype(int)
     inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3/5x127x127_training_min_{cap}.hdf5'
-        
-
-    f = h5py.File(outfile, 'a')
-    print('output', outfile)
-    for k in hf.keys():
-
-        tmp = hf[k]
-        s = list(np.shape(tmp))
-        s[0] = len(inds)          
-        dset = f.create_dataset(k, shape = s, dtype = tmp.dtype)
-        dset.write_direct(tmp[inds])
-    f.close()
-    hf.close()
-    
-def make_hsc_v6_large_z_max(cap = 2):
-    '''
-    Create image dataset for easier training, with minimum z = cap. - Billy 
-
-
-    '''
-    current_file = '/data/HSC/HSC_v6/step2A/127x127/5x127x127_training.hdf5'
-    hf = h5py.File(current_file, 'r')
-    y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
-    inds = np.array([])
-    for j in range(len(y_train)):
-        if(y_train[j] <= cap):
-            inds = np.append(inds, j)
-    inds = inds.astype(int)
-    inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3/5x127x127_training_max_{cap}.hdf5'
-        
-
-    f = h5py.File(outfile, 'a')
-    print('output', outfile)
-    for k in hf.keys():
-
-        tmp = hf[k]
-        s = list(np.shape(tmp))
-        s[0] = len(inds)          
-        dset = f.create_dataset(k, shape = s, dtype = tmp.dtype)
-        dset.write_direct(tmp[inds])
-    f.close()
-    hf.close()
-
-def make_hsc_v6_large_z_testing(cap = 1):
-    '''
-    Create image dataset for easier training, with minimum z = cap. - Billy 
-
-
-    '''
-    current_file = '/data/HSC/HSC_v6/step2A/127x127/5x127x127_testing.hdf5'
-    hf = h5py.File(current_file, 'r')
-    y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
-    inds = np.array([])
-    for j in range(len(y_train)):
-        if(y_train[j] >= cap):
-            inds = np.append(inds, j)
-    inds = inds.astype(int)
-    inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3/5x127x127_testing_min_{cap}.hdf5'
+    outfile = f'/data/HSC/HSC_v6/step3A/64x64_validation_z_more_than_{cap}.hdf5'
         
 
     f = h5py.File(outfile, 'a')
@@ -378,8 +288,8 @@ def make_hsc_v6_small_hdf(ntrain=10000,ntest=2000,nvalidation=2000):
     '''
     sample_sizes = [ntrain,ntest,nvalidation]
 
-    inputfiles = ['127x127_mae_in_training.hdf5','127x127_mae_in_testing.hdf5','127x127_mae_in_validation.hdf5']
-    directory = '/data/HSC/HSC_v6/step3/'
+    inputfiles = ['64x64_training_z_less_than_2.hdf5','64x64_testing_z_less_than_2.hdf5','64x64_validation_z_less_than_2.hdf5']
+    directory = '/data/HSC/HSC_v6/step3A/'
     for i in range(len(sample_sizes)):
         current_file = os.path.join(directory,inputfiles[i])
         nsample = sample_sizes[i]
