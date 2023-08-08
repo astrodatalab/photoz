@@ -7,6 +7,41 @@ import h5py
 
 # modified by Billy
 
+def make_hsc_v6_normalized():
+    '''
+    Create image dataset for easier training, with minimum z = cap. - Billy 
+
+
+    '''
+    current_file = '/data/HSC/HSC_v6/step3A/64x64_training_z_less_than_2.hdf5'
+    hf = h5py.File(current_file, 'r')
+    y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
+    inds = np.array([])
+    for j in range(len(y_train)):
+        if True:
+            inds = np.append(inds, j)
+    inds = inds.astype(int)
+    inds = np.sort(inds)
+    outfile = f'/data/HSC/HSC_v6/step3A/64x64_training_z_less_than_2_normalized.hdf5'
+        
+
+    # f = h5py.File(outfile, 'a')
+    print('output', outfile)
+    for k in hf.keys():
+        
+        if k == 'image':
+            print(hf[k].shape)
+        
+        tmp = hf[k]
+        s = list(np.shape(tmp))
+        s[0] = len(inds)          
+        # dset = f.create_dataset(k, shape = s, dtype = tmp.dtype)
+        # dset.write_direct(tmp[inds])
+    # f.close()
+    hf.close()
+
+
+
 def make_hsc_v6_small_z(cap = 1):
     '''
     Create image dataset for easier training, with minimum z = cap. - Billy 
