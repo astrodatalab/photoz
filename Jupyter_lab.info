@@ -1,0 +1,53 @@
+SLURM script to run the JupyterLab
+
+The Advanced Research Computing at Hopkins (ARCH)
+
+
+Current date and time 08/09/2023 - 01:38:18 PM
+Nodes:       	1
+Cores/task:  	24
+Total cores: 	24
+# GPU: 	2
+Partition: 	a100
+Walltime:  	00-01:00
+Current directory: 	/home/yli21/photoz 
+
+You can start the notebook to communicate via a secure protocol
+mode by setting the certfile option to .template_jupyter_notebook_config.py. 
+
+Before running the slurm script ($ sbatch jupyter_lab.slurm.script) 
+
+Uncomment the following lines refer to keyfile and certfile:
+ #c.NotebookApp.keyfile = u'/home/<userid>/.jupyter/ssl/arch_rockfish.key'
+ #c.NotebookApp.certfile = u'/home/<userid>/.jupyter/ssl/arch_rockfish.pem' 
+
+
+Note: In this case change to HTTPS protocol to login to Jupyter Lab using your web browser 
+
+
+ https://localhost:<PORT>
+
+
+Instructions for adding multiple envs:
+  
+    # change to the proper version of python or conda
+  
+ ## For Python Virtual environment
+  
+ 	 $ module load python; source <myenv>/bin/activate
+  
+ ## For Conda environment
+  
+ 	 $ module load anaconda; conda activate <myenv>
+  
+ then:
+  
+ 	 (myenv)$ pip install ipykernel
+  
+ # Install Jupyter kernel
+  
+ 	 (myenv)$ ipython kernel install --user --name=<any_name_for_kernel> --display-name "Python (myenv)"
+  
+ # Listing all the available environments (kernels)
+  
+ 	 (myenv)$ jupyter kernelspec list

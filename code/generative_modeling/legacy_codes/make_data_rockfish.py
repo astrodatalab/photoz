@@ -8,11 +8,11 @@ import h5py
 # modified by Billy
 
 def make_hsc_v6_normalized():
-    current_file = '/data/HSC/HSC_v6/step3A/64x64_training_z_less_than_2.hdf5'
+    current_file = '/data/tuando/data/HSC/HSC_v6/step3A/64x64/64x64_training_z_less_than_2.hdf5'
     hf = h5py.File(current_file, 'r')
     y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
     inds = np.arange(len(y_train)) # Use np.arange instead of manually building inds
-    outfile = f'/data/HSC/HSC_v6/step3A/64x64_training_z_less_than_2_normalized.hdf5'
+    outfile = f'/data/tuando/data/HSC/HSC_v6/step3A/64x64/64x64_training_z_less_than_2_normalized.hdf5'
 
     f = h5py.File(outfile, 'a')
     print('output', outfile)
@@ -44,7 +44,7 @@ def make_hsc_v6_small_z(cap = 1):
 
 
     '''
-    current_file = '/data/HSC/HSC_v6/step3A/64x64_testing.hdf5'
+    current_file = '/data/tuando/data/HSC/HSC_v6/step3A/64x64/64x64_training.hdf5'
     hf = h5py.File(current_file, 'r')
     y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
     inds = np.array([])
@@ -53,7 +53,7 @@ def make_hsc_v6_small_z(cap = 1):
             inds = np.append(inds, j)
     inds = inds.astype(int)
     inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3A/64x64_testing_z_less_than_{cap}.hdf5'
+    outfile = f'/data/tuando/data/HSC/HSC_v6/step3A/64x64/64x64_training_z_less_than_{cap}.hdf5'
         
 
     f = h5py.File(outfile, 'a')
@@ -74,7 +74,7 @@ def make_hsc_v6_large_z(cap = 1):
 
 
     '''
-    current_file = '/data/HSC/HSC_v6/step3A/64x64_testing.hdf5'
+    current_file = '/data/tuando/data/HSC/HSC_v6/step3A/64x64/64x64_training.hdf5'
     hf = h5py.File(current_file, 'r')
     y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
     inds = np.array([])
@@ -83,7 +83,7 @@ def make_hsc_v6_large_z(cap = 1):
             inds = np.append(inds, j)
     inds = inds.astype(int)
     inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3A/64x64_testing_z_more_than_{cap}.hdf5'
+    outfile = f'/data/tuando/data/HSC/HSC_v6/step3A/64x64/64x64_training_z_more_than_{cap}.hdf5'
         
 
     f = h5py.File(outfile, 'a')

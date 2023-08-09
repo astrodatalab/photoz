@@ -1,0 +1,95 @@
+#!/bin/bash
+# ---------------------------------------------------
+# The Advanced Research Computing at Hopkins (ARCH)
+# User and Application Support < help@rockfish.jhu.edu >
+#
+# SLURM script to run the JupyterLab
+#
+# ---------------------------------------------------
+#  INPUT ENVIRONMENT VARIABLES
+# ---------------------------------------------------
+#SBATCH --job-name=Jupyter_lab_yli21
+#SBATCH --time=00-01:00
+#SBATCH --partition=a100
+#SBATCH --mem=8G
+#SBATCH --signal=USR2
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=24
+#SBATCH --account=tuando_gpu
+#SBATCH --gres=gpu:2
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=yunqil@ucla.edu
+#SBATCH --output=Jupyter_lab.job.%j.out
+#SBATCH --error=Jupyter_lab.job.%j.err
+# ---------------------------------------------------
+
+export DIR=/home/yli21/photoz
+
+# ---------------------------------------------------
+#  Set environment with jupyterlab
+# ---------------------------------------------------
+#
+
+module load jupyterlab
+# source $HOME/jp_lab/bin/activate
+
+# ---------------------------------------------------
+
+
+# export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
+# Set OMP_NUM_THREADS to prevent OpenBLAS (and any other OpenMP-enhanced
+# libraries used by R) from spawning more threads than the number of processors
+# allocated to the job.
+#
+# Set R_LIBS_USER to a path specific to IRKernel to avoid conflicts with
+# personal libraries from any R installation in the host environment
+#
+
+<< 'MULTILINE-COMMENT'
+
+# --------- Instruction to enable R kernel into the jupyterlab ---------
+
+Please, run this command into prompt. Do not uncomment it!
+
+$ module load r/4.0.2 gdal/3.4.1 r-crayon/1.3.4 r-devtools/2.3.0 r-digest/0.6.25  r-evaluate/0.14 r-jsonlite/1.6.1 r-pkgconfig/2.0.2
+$ export R_LIBS_USER=$HOME/rlibs/4.0.2/gcc/9.3.0
+
+$ R <enter>
+> install.packages(c('leaflet','repr', 'IRdisplay', 'pbdZMQ', 'uuid'), dependencies = TRUE)
+> install.packages('IRkernel')
+> IRkernel::installspec()
+
+MULTILINE-COMMENT
+
+
+XDG_RUNTIME_DIR=””
+
+NODE=$(hostname -s)
+readonly export PORT=$(python -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')
+
+sed -e "s/PORT/$PORT/g" $DIR/.template_jupyter_notebook_config.py > $DIR/.jupyter/jupyter_notebook_config.py
+
+cat > Jupyter_lab.job.${SLURM_JOB_ID}.login <<END
+
+1. SSH tunnel from your workstation using the following command:
+
+   ssh -N -L ${PORT}:${NODE}:${PORT} ${USER}@login.rockfish.jhu.edu
+
+2. log in to Jupyter Lab in your web browser using the Rockfish cluster credentials (username and password) at:
+
+   http://localhost:${PORT}
+
+   user: ${USER}
+   password: < ARCH password >
+
+3. When done using Jupyter Lab, terminate the job by:
+
+   a. Exit the Jupyter Lab ("file" button in the top left corner of the Jupyter Lab and the shut down)
+   b. Issue the following command on the login node:
+
+  scancel -f ${SLURM_JOB_ID}
+END
+
+jupyter-lab --config $DIR/.jupyter/jupyter_notebook_config.py
+
