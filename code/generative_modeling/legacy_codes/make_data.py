@@ -38,13 +38,13 @@ def make_hsc_v6_normalized():
 
 
 
-def make_hsc_v6_small_z(cap = 1):
+def make_hsc_v6_small_z(cap = 2):
     '''
     Create image dataset for easier training, with minimum z = cap. - Billy 
 
 
     '''
-    current_file = '/data/HSC/HSC_v6/step3A/64x64_testing.hdf5'
+    current_file = '/data/HSC/HSC_v6/temp/5x127x127_testing.hdf5'
     hf = h5py.File(current_file, 'r')
     y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
     inds = np.array([])
@@ -53,7 +53,7 @@ def make_hsc_v6_small_z(cap = 1):
             inds = np.append(inds, j)
     inds = inds.astype(int)
     inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3A/64x64_testing_z_less_than_{cap}.hdf5'
+    outfile = f'/data/HSC/HSC_v6/temp/5x127x127_testing_z_less_than_{cap}.hdf5'
         
 
     f = h5py.File(outfile, 'a')
@@ -68,13 +68,13 @@ def make_hsc_v6_small_z(cap = 1):
     f.close()
     hf.close()
 
-def make_hsc_v6_large_z(cap = 1):
+def make_hsc_v6_large_z(cap = 2):
     '''
-    Create image dataset for easier training, with minimum z = cap. - Billy 
+    Create image dataset for easier training, with maximum z = cap. - Billy 
 
 
     '''
-    current_file = '/data/HSC/HSC_v6/step3A/64x64_testing.hdf5'
+    current_file = '/data/HSC/HSC_v6/temp/5x127x127_testing.hdf5'
     hf = h5py.File(current_file, 'r')
     y_train = np.asarray(hf['specz_redshift'][0 : ])[..., None]
     inds = np.array([])
@@ -83,7 +83,7 @@ def make_hsc_v6_large_z(cap = 1):
             inds = np.append(inds, j)
     inds = inds.astype(int)
     inds = np.sort(inds)
-    outfile = f'/data/HSC/HSC_v6/step3A/64x64_testing_z_more_than_{cap}.hdf5'
+    outfile = f'/data/HSC/HSC_v6/temp/5x127x127_testing_z_more_than_{cap}.hdf5'
         
 
     f = h5py.File(outfile, 'a')
@@ -455,13 +455,13 @@ def make_hsc_v6_small_hdf_single(ntrain=10000,ntest=2000,nvalidation=2000):
     '''
     sample_sizes = [ntrain,ntest,nvalidation]
 
-    inputfiles = ['127x127_mae_out.hdf5']
-    directory = '/data/HSC/HSC_v6/step3/'
+    inputfiles = ['5x127x127.hdf5']
+    directory = '/data/HSC/HSC_v6/temp/'
     current_file = os.path.join(directory,inputfiles[0])
     ntrain = sample_sizes[0]
     ntest = sample_sizes[1]
     nvalidation = sample_sizes[2]
-    hf = h5py.File('/mnt/data/HSC/HSC_v6/step3/127x127_mae_out.hdf5','r')
+    hf = h5py.File('/mnt/data/HSC/HSC_v6/step3/5x127x127.hdf5','r')
         
     inds = random.sample(list(np.arange(len(hf['object_id']))),sample_sizes[0]+sample_sizes[1]+sample_sizes[2])
     inds_train = np.sort(inds[:ntrain])
