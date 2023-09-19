@@ -5,7 +5,7 @@ from typing import Tuple, Union, Optional
 import h5py as h5
 from tensorflow.keras.utils import Sequence
 from tensorflow.keras.utils import to_categorical
-
+from sklearn.preprocessing  import MinMaxScaler, StandardScaler
 from albumentations import Compose
 import numpy as np
 
@@ -46,6 +46,12 @@ class HDF5ImageGenerator(Sequence):
         with 0 mean and unit variance.
         "norm" mode means normalization to range [0, 1].
         Default is "std".
+    y_scaler: True or Flase
+        Currently, y_scaler only supports MinMaxScaler
+        y_range is required
+    y_range: Default (0,1) or tuple 
+        Needed when setting y_scaler to true
+        Standardization to range provided.
     num_classes : None or int
         Specifies the total number of classes
         for labels encoding.
@@ -101,6 +107,8 @@ class HDF5ImageGenerator(Sequence):
         batch_size=32,
         shuffle=True,
         scaler=True,
+        y_scaler = False, # NEW
+        y_range = (0, 1), # NEW
         num_classes=None,
         labels_encoding="hot",
         smooth_factor=0.1,
@@ -144,7 +152,21 @@ class HDF5ImageGenerator(Sequence):
         self.scaler: bool = scaler
         self.num_classes: int = num_classes
         self.smooth_factor: float = smooth_factor
-
+        
+        #NEW
+        self.y_scaler: bool = y_scaler
+        
+        if self.y_scaler == "minmax":
+            self.y_range: tuple = y_range
+            self.label_scaler = MinMaxScaler(feature_range = y_range)
+        elif self.y_scaler == "std":
+            self.label_scaler = StandardScaler()
+            
+        self.fit_label_scaler()
+        
+            
+        
+        
         self._indices = np.arange(self.__get_dataset_shape(self.X_key, 0))
 
     def __repr__(self):
@@ -355,7 +377,7 @@ class HDF5ImageGenerator(Sequence):
         # Shall we rescale features?
         if self.scaler:
             batch_X = self.apply_normalization(batch_X)
-
+    
         # Shall we apply labels encoding?
         if self.labels_encoding:
             batch_y = self.apply_labels_encoding(
@@ -363,7 +385,13 @@ class HDF5ImageGenerator(Sequence):
                 smooth_factor=self.smooth_factor
                 if self.labels_encoding == "smooth" else None,
             )
-
+        
+        #Shall we apply y scaling?
+        if self.y_scaler:
+            batch_y = batch_y.reshape(-1,1)
+            batch_y = self.label_scaler.transform(batch_y)
+            batch_y = batch_y.flatten()
+            
         return (batch_X, batch_y)
 
     def __getitem__(
@@ -405,3 +433,33 @@ class HDF5ImageGenerator(Sequence):
          at the end of each epoch.
         """
         self.__shuffle_indices()
+        
+    #NEW
+    def fit_label_scaler(self):
+        """If y_scaling is true, the y_key is loaded so
+        that the maximum and minimum can be computed by MinMaxScale's
+        fit method
+        """
+        if self.y_scaler:
+            with h5.File('/data3/Jonathan/five_band_image127x127_with_metadata.hdf5', "r") as file:
+                labels = np.array(file[self.y_key])
+                labels = labels.reshape(-1, 1)
+                self.label_scaler.fit(labels)
+                
+    def inverse_transform_labels(self, scaled_labels: np.ndarray) -> np.ndarray:
+        """
+        Returns the inverse of the transformed y_key
+        
+        Arguments
+        ---------
+        scaled_labels: np.ndarray
+            The scaled y_key array to be transformed back based on dataset fit
+            
+        Returns
+        -------
+            An 1D np.ndarray of the unscaled y_key values
+        """
+        if self.y_scaler:
+            scaled_labels = scaled_labels.reshape(-1,1)
+            return self.label_scaler.inverse_transform(scaled_labels)
+        return scaled_labels.flatten()
