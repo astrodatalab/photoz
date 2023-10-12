@@ -44,3 +44,6 @@ Contain plots used to analyze the impact of shape parameters in modle performanc
 
 partial_correlation_analysis.ipynb
 Analyzing the partial and mutual correlations between shape parameters and metrics. Table with some of the results in https://docs.google.com/document/d/1lsrSL0EyliGIe-ka9Ai4G1TCQVNfKinX91eFACllnqs/edit
+
+model_performance_deltas.ipynb (In progress)
+Exploring how photo-z results differ across 3 models (photometry-only, image-only, images+photometry). Basically, what advantages, if any, are provided by one data type over the other? For this, we look at our current hybrid model and subtract CNN/NN results to look for patterns. Not implemented yet, but we will look at a correlation matrix with photos, specz, redshift deltas, and shape parameters.
