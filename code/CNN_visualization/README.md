@@ -39,11 +39,11 @@ Output files found in:
 How to use HDF5DataGenerator.ipynb
 Describes how to use batching for images with the new data generator.
 
-shape_parameter_metrics_plots.ipynb & shape_parameter_plots_all_ bands.ipynb
-Contain plots used to analyze the impact of shape parameters in modle performance.
+shape_parameter_metrics_plots.ipynb & shape_parameter_plots_all_bands.ipynb
+Contain plots used to analyze the impact of shape parameters in model performance.
 
 partial_correlation_analysis.ipynb
 Analyzing the partial and mutual correlations between shape parameters and metrics. Table with some of the results in https://docs.google.com/document/d/1lsrSL0EyliGIe-ka9Ai4G1TCQVNfKinX91eFACllnqs/edit
 
 model_performance_deltas.ipynb (In progress)
-Exploring how photo-z results differ across 3 models (photometry-only, image-only, images+photometry). Basically, what advantages, if any, are provided by one data type over the other? For this, we look at our current hybrid model and subtract CNN/NN results to look for patterns. Not implemented yet, but we will look at a correlation matrix with photos, specz, redshift deltas, and shape parameters.
+Exploring how photo-z results differ across 3 models (photometry-only, image-only, images+photometry). Basically, what advantages, if any, are provided by one data type over the other? For this, we look at our current hybrid model and subtract CNN/NN results to look for patterns. The results are split between 4 categories. Where the CNN/NN had the lowest/highest RMSE. The next step is to incorporate a plot that has the Euclidean distances between redshift estimates across models as functions of redshift. <ins>We also want to see how these plots look for the Bayesian version of the models.</ins>
