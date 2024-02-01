@@ -1,0 +1,22 @@
+#   1 NUMBER                 Running object number                                     
+#   2 PETRO_RADIUS           Petrosian apertures in units of A or B                    
+#   3 X_IMAGE                Object position along x                                    [pixel]
+#   4 Y_IMAGE                Object position along y                                    [pixel]
+#   5 XMIN_IMAGE             Minimum x-coordinate among detected pixels                 [pixel]
+#   6 XMAX_IMAGE             Maximum x-coordinate among detected pixels                 [pixel]
+#   7 YMIN_IMAGE             Minimum y-coordinate among detected pixels                 [pixel]
+#   8 YMAX_IMAGE             Maximum y-coordinate among detected pixels                 [pixel]
+#   9 ISOAREA_IMAGE          Isophotal area above Analysis threshold                    [pixel**2]
+#  10 ISOAREA_WORLD          Isophotal area above Analysis threshold                    [deg**2]
+#  11 A_IMAGE                Profile RMS along major axis                               [pixel]
+#  12 B_IMAGE                Profile RMS along minor axis                               [pixel]
+#  13 THETA_IMAGE            Position angle (CCW/x)                                     [deg]
+#  14 THETA_WORLD            Position angle (CCW/world-x)                               [deg]
+#  15 MU_MAX                 Peak surface brightness above background                   [mag * arcsec**(-2)]
+#  16 ELLIPTICITY            1 - B_IMAGE/A_IMAGE                                       
+#  17 FLUX_RADIUS            Fraction-of-light radii                                    [pixel]
+#  18 SPHEROID_SERSICN       Spheroid Sersic index from fitting                        
+         1  9.90     60.7368     60.2556         51         70         49         72       327 7.291898e-07     4.186     3.586  89.53 -89.61  -5.2324    0.143      5.986  1.598
+         2 10.56     77.8462      4.8655         77         79          4          6         8 1.783951e-08     0.837     0.684 -48.47  48.44  -2.7485    0.183      2.440  0.772
+         3 10.56     78.7059     72.7290         75         84         68         77        73 1.627855e-07     2.258     2.237  41.72 -42.00  -3.3832    0.009      5.322  1.401
+         4  4.62     94.6603    114.8387         87        102        107        120       179 3.991589e-07     2.083     2.052  -6.58   6.53  -7.9784    0.015      2.075  1.162
