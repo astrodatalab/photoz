@@ -643,6 +643,113 @@ def compare_point_metrics_bar(model_arr, model_names, fig_size=(10,5), conventio
         plt.yticks(fontsize=16)
         plt.legend(iter(ax), model_names, fontsize=16) # must iterate over the bars for the legend to work
         
+
+def false_color_plot(images, percentile = 99, save_fig = False):
+    """
+    Input with dimensions 
+    (number of images, channels, 127, 127) or (number of images, channels, 64, 64)
+    Plots all the images in false colors
+    
+    "percentile" defines the vmax for the display
+    
+    vmin is defined as 0. 
+    """
+    
+    n_images = len(images)
+    
+    fig, axes = plt.subplots(n_images, 2, figsize = (10, 5 * n_images))
+    for i in range(n_images):
+        
+        image = images[i]
+        image = np.maximum(image, 0)
+        
+        percentile_cur = np.percentile(image, percentile)
+        image = image / percentile_cur if percentile_cur != 0 else image
+        image = np.minimum(image, 1)
+        
+        bands = [image[i] for i in range(5)]
+        colors = ['g', 'r', 'i', 'z', 'y']
+        coloy_bands = []
+        
+        for band, color in zip(bands, colors):
+        
+            coloy_band = np.zeros((64, 64, 3), dtype = np.float32)
+
+            if color == 'g':
+                coloy_band[:, :, 2] = band  # r channel
+            elif color == 'r':
+                coloy_band[:, :, 2] = band / 2  # r channel
+                coloy_band[:, :, 1] = band / 2  # i channel
+            elif color == 'i':
+                coloy_band[:, :, 1] = band  # i channel
+            elif color == 'z':
+                coloy_band[:, :, 1] = band / 2  # i channel
+                coloy_band[:, :, 0] = band / 2  # y channel
+            elif color == 'y':
+                coloy_band[:, :, 0] = band  # y channel
+
+            coloy_bands.append(coloy_band)
+
+        combined_image = np.mean(coloy_bands, axis = 0) 
+        combined_image = combined_image / np.max(combined_image)
+
+        axes[i, 0].imshow(combined_image)
+        axes[i, 0].axis('off')
+        
+        axes[i, 0].text(0.75, 0.05, f'Linear Scale', ha = 'center', va = 'center', 
+                    transform = axes[i, 0].transAxes, color = 'white', fontsize = 25,
+                    bbox = dict(facecolor = 'black', alpha = 0.5))
+        
+        image = images[i]
+        image = np.maximum(image, 0)
+        percentile_cur = np.percentile(image, percentile)
+        min_non_zero = np.min(image[np.nonzero(image)])
+        image = np.where(image == 0, min_non_zero, image)
+        image = np.log(image)
+        min_value = np.min(image)
+        max_value = np.max(image)
+        image = (image - min_value) / (max_value - min_value)
+        
+        bands = [image[i] for i in range(5)]
+        colors = ['g', 'r', 'i', 'z', 'y']
+        coloy_bands = []
+        
+        for band, color in zip(bands, colors):
+        
+            coloy_band = np.zeros((64, 64, 3), dtype = np.float32)
+
+            if color == 'g':
+                coloy_band[:, :, 2] = band  # r channel
+            elif color == 'r':
+                coloy_band[:, :, 2] = band / 2  # r channel
+                coloy_band[:, :, 1] = band / 2  # i channel
+            elif color == 'i':
+                coloy_band[:, :, 1] = band  # i channel
+            elif color == 'z':
+                coloy_band[:, :, 1] = band / 2  # i channel
+                coloy_band[:, :, 0] = band / 2  # y channel
+            elif color == 'y':
+                coloy_band[:, :, 0] = band  # y channel
+
+            coloy_bands.append(coloy_band)
+
+        combined_image = np.mean(coloy_bands, axis = 0) 
+        combined_image = combined_image/ np.max(combined_image)
+        
+        axes[i, 1].imshow(combined_image)
+        axes[i, 1].axis('off')
+        
+        axes[i, 1].text(0.81, 0.05, f'Log Scale', ha = 'center', va = 'center', 
+                    transform = axes[i, 1].transAxes, color = 'white', fontsize = 25,
+                    bbox = dict(facecolor = 'black', alpha = 0.5))
+        
+    plt.tight_layout()
+    
+    if save_fig:
+        plt.savefig('false_color_plot.png')
+        
+    plt.show()
+        
         
 ###############
 # DATA SAVING #
