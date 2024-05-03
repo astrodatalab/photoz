@@ -4,7 +4,7 @@ import pandas as pd
 import photoz_utils
 import random
 import h5py
-
+from astropy.io import fits
 
 def make_hsc_v5(inputfile='/mnt/data/HSC/HSC_v3/all_specz_flag_forced_forced2_spec_z_matched_online.csv',
                 outputfile='/mnt/data/HSC/HSC_v5/HSC_v5.csv'):
@@ -435,3 +435,39 @@ def make_hsc_v6_large(ntrain=187930,ntest=37586,nvalidation=37586):
             tmp = None
         f.close()
     hf.close()
+
+def extract_tabular_data(hdf5file):
+    '''
+    Extract tabular data from hdf5 file and save it to csv file.
+    '''
+    hf = h5py.File(hdf5file,'r')
+    part = os.path.splitext(hdf5file)
+    csv_file = part[0] + '.csv'
+    data = {}
+    for k in hf.keys():
+        if k != 'image':
+            if hf[k][:].ndim == 1:
+                data[k] = hf[k][:]
+            else:
+                shape = hf[k][:].shape
+                if len(shape) == 2 and shape[1] == 1:  # Check if shape is (n, 1)
+                    data[k] = hf[k][:].reshape(-1)  # Reshape to one dimension
+                else:
+                    print(k, shape)
+    df = pd.DataFrame(data)
+    df.to_csv(csv_file, index=False)
+    hf.close()
+
+def extract_tabular_data_hsc_v6():
+    '''
+    Extract tabular data from the HSC v6 hdf5 file and save it to csv files.
+    '''
+    hdf5files = ['/data/HSC/HSC_v6/step2A/127x127/5x127x127_training_with_morphology.hdf5',
+                 '/data/HSC/HSC_v6/step2A/127x127/5x127x127_testing_with_morphology.hdf5',
+                 '/data/HSC/HSC_v6/step2A/127x127/5x127x127_validation_with_morphology.hdf5']
+    
+    for hdf5file in hdf5files:
+        extract_tabular_data(hdf5file)
+
+
+
