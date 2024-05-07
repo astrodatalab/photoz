@@ -1,0 +1,8 @@
+# ShearEstimation Directory
+
+this notebook contains data-simulating code and shear-estimation code
+
+## Notebooks
+
+- 'NonStationaryPSF.ipyn': dataset simulation code for parametric galaxies with non-uniform psf
+- 'MomentBasedShearEstimation': code for moment-based shear estimation using ngmix library 
