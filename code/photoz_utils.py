@@ -11,7 +11,8 @@ from sklearn.model_selection import train_test_split
 from astropy.stats import biweight_location, biweight_midvariance
 from scipy.stats import median_abs_deviation
 from sklearn.metrics import mean_squared_error
-
+import math
+import numpy as np
 
 
 ######################
@@ -568,7 +569,88 @@ def compare_point_metrics_scatter(metrics_array, legends, desc, markers, zmax=4,
             plt.yticks(fontsize=16)
             plt.legend(fontsize=16)
             
+def compare_point_metrics_scatter2(metrics_array, legends, metrics = None,
+    markers=None, zmax=4, marker_size=130,xlim=None,label_plots=True):
+    """
+    Pass in a list where the elements are the output of binned get_point_metrics() from photoz_utils.py and compare some of the metrics on each plot.
+        metrics_array: list
+            A list of metric DataFrames acquired from binned get_point_metrics() output.
+        legends: list
+            Legend labels for the models in the metrics_array as strings.
+        zmax: float
+            Maximum redshift to be displayed.
+        marker_size: int
+            Size of the markers displayed.
+    Keywords:
+        markers: list
+            A list of strings where you indicate the markers for models in metrics_array.
+        meters: list
+            A list of strings where you indicate the metrics to be displayed. (Default: all)
+        xlim: tuple
+            Tuple of the form (xmin,xmax) to set the x limits of the plot.
+        label_plots: bool 
+            Label the corners of the plots with a letter. (Default: True)
+
+    Return:
+        fig,axs: tuple 
+            Tuple of the figure and the axes of the plot.
+
+    """
+    index = len(metrics_array)
+    
+    # assume the metrics are the same as the column names
+    if metrics is None:
+        metrics = metrics_array[0].columns[1:]
+    #metrics = ['bias_conv', 'scatter_conv', 'outlier_conv', 'loss', 'mse']
+    if markers is None:
+        markers = ['o','X','s','v','^','+','d','*','p','h','X','P','D']
+    fig, axs = plt.subplots(math.ceil(len(metrics)/2), 2, figsize=(17,16))
+    plt.subplots_adjust(hspace=0.3)
+
+    labels = ['A','B','C','D','E','F','G','H','I','J','K','L','M']
+    for i in enumerate(metrics):
+        plt.subplot(math.ceil(len(metrics)/2), 2, i[0] + 1)
+        for j in range(0,index):
             
+            sns.lineplot(x=[0, zmax], y=[0, 0], linewidth=2, color='black')
+            bin_lefts = (metrics_array[j]).iloc[:,0].apply(lambda x: x.left)
+            bins_rights = (metrics_array[j]).iloc[:,0].apply(lambda x: x.right)
+            bin_center = (bin_lefts + bins_rights)/2
+            sns.scatterplot(
+                x=bin_center, 
+                y=metrics_array[j][i[1]], 
+                marker = markers[j], 
+                edgecolor='none', 
+                label=f'{legends[j]}', 
+                s=marker_size)
+            if xlim is not None:
+                plt.xlim(xlim)
+            else:
+                # get xlim from the plot
+                xlim = plt.xlim()
+
+                
+            # using the xlim calculate the ylim of the plot from the data within that x range
+            # Find the minimum and maximum within the x range from xlim
+            x_range_mask = (bin_center >= xlim[0]) & (bin_center <= xlim[1])
+            y_values = metrics_array[j][i[1]][x_range_mask]
+            min_value = np.min(y_values)
+            max_value = np.max(y_values)
+            delta = max_value - min_value
+            plt.ylim(min_value-delta*0.1,max_value+delta*0.1)
+
+
+    # label the corner of the plot
+    if label_plots:
+        for i in range(len(metrics)):
+            current_ax = axs.flat[i]
+            plt.text(-0.25,0.95,labels[i]+')',transform=current_ax.transAxes,fontsize=18,weight='bold')
+        
+
+    return fig,axs
+            
+
+
 def compare_point_metrics_table(metrics_array1, metrics_array2, caption):
     """
     Pass in the output of get_point_metrics() from photoz_utils.py and get a table comparing the percent increase that metrics_array1
@@ -642,113 +724,6 @@ def compare_point_metrics_bar(model_arr, model_names, fig_size=(10,5), conventio
         plt.xticks(fontsize=16)
         plt.yticks(fontsize=16)
         plt.legend(iter(ax), model_names, fontsize=16) # must iterate over the bars for the legend to work
-        
-
-def false_color_plot(images, percentile = 99, save_fig = False):
-    """
-    Input with dimensions 
-    (number of images, channels, 127, 127) or (number of images, channels, 64, 64)
-    Plots all the images in false colors
-    
-    "percentile" defines the vmax for the display
-    
-    vmin is defined as 0. 
-    """
-    
-    n_images = len(images)
-    
-    fig, axes = plt.subplots(n_images, 2, figsize = (10, 5 * n_images))
-    for i in range(n_images):
-        
-        image = images[i]
-        image = np.maximum(image, 0)
-        
-        percentile_cur = np.percentile(image, percentile)
-        image = image / percentile_cur if percentile_cur != 0 else image
-        image = np.minimum(image, 1)
-        
-        bands = [image[i] for i in range(5)]
-        colors = ['g', 'r', 'i', 'z', 'y']
-        coloy_bands = []
-        
-        for band, color in zip(bands, colors):
-        
-            coloy_band = np.zeros((64, 64, 3), dtype = np.float32)
-
-            if color == 'g':
-                coloy_band[:, :, 2] = band  # r channel
-            elif color == 'r':
-                coloy_band[:, :, 2] = band / 2  # r channel
-                coloy_band[:, :, 1] = band / 2  # i channel
-            elif color == 'i':
-                coloy_band[:, :, 1] = band  # i channel
-            elif color == 'z':
-                coloy_band[:, :, 1] = band / 2  # i channel
-                coloy_band[:, :, 0] = band / 2  # y channel
-            elif color == 'y':
-                coloy_band[:, :, 0] = band  # y channel
-
-            coloy_bands.append(coloy_band)
-
-        combined_image = np.mean(coloy_bands, axis = 0) 
-        combined_image = combined_image / np.max(combined_image)
-
-        axes[i, 0].imshow(combined_image)
-        axes[i, 0].axis('off')
-        
-        axes[i, 0].text(0.75, 0.05, f'Linear Scale', ha = 'center', va = 'center', 
-                    transform = axes[i, 0].transAxes, color = 'white', fontsize = 25,
-                    bbox = dict(facecolor = 'black', alpha = 0.5))
-        
-        image = images[i]
-        image = np.maximum(image, 0)
-        percentile_cur = np.percentile(image, percentile)
-        min_non_zero = np.min(image[np.nonzero(image)])
-        image = np.where(image == 0, min_non_zero, image)
-        image = np.log(image)
-        min_value = np.min(image)
-        max_value = np.max(image)
-        image = (image - min_value) / (max_value - min_value)
-        
-        bands = [image[i] for i in range(5)]
-        colors = ['g', 'r', 'i', 'z', 'y']
-        coloy_bands = []
-        
-        for band, color in zip(bands, colors):
-        
-            coloy_band = np.zeros((64, 64, 3), dtype = np.float32)
-
-            if color == 'g':
-                coloy_band[:, :, 2] = band  # r channel
-            elif color == 'r':
-                coloy_band[:, :, 2] = band / 2  # r channel
-                coloy_band[:, :, 1] = band / 2  # i channel
-            elif color == 'i':
-                coloy_band[:, :, 1] = band  # i channel
-            elif color == 'z':
-                coloy_band[:, :, 1] = band / 2  # i channel
-                coloy_band[:, :, 0] = band / 2  # y channel
-            elif color == 'y':
-                coloy_band[:, :, 0] = band  # y channel
-
-            coloy_bands.append(coloy_band)
-
-        combined_image = np.mean(coloy_bands, axis = 0) 
-        combined_image = combined_image/ np.max(combined_image)
-        
-        axes[i, 1].imshow(combined_image)
-        axes[i, 1].axis('off')
-        
-        axes[i, 1].text(0.81, 0.05, f'Log Scale', ha = 'center', va = 'center', 
-                    transform = axes[i, 1].transAxes, color = 'white', fontsize = 25,
-                    bbox = dict(facecolor = 'black', alpha = 0.5))
-        
-    plt.tight_layout()
-    
-    if save_fig:
-        plt.savefig('false_color_plot.png')
-        
-    plt.show()
         
         
 ###############

@@ -1,7 +1,7 @@
 # very large model files
 *.pb   
- *.ckpt*
- *.index
+*.ckpt*
+*.index
 *.neptune*
 
 # Compiled files
